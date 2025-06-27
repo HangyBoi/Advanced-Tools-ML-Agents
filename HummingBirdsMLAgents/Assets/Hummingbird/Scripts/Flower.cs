@@ -125,6 +125,6 @@ public class Flower : MonoBehaviour
 
         // Find the nectar collider (trigger) and the flower collider (solid)
         flowerCollider = transform.Find("FlowerCollider").GetComponent<Collider>();
-        nectarCollider = transform.Find("NectarCollider").GetComponent<Collider>();
+        nectarCollider = transform.Find("FlowerNectarCollider").GetComponent<Collider>();
     }
 }
