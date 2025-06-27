@@ -80,7 +80,7 @@ public class FlowerArea : MonoBehaviour
         {
             Transform child = parent.GetChild(i);
 
-            if (child.CompareTag("flower_plant"))
+            if (child.CompareTag("Flower_Plant"))
             {
                 // Found a flower plant, add it to the list
                 flowerPlants.Add(child.gameObject);

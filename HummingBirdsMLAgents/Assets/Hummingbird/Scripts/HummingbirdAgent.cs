@@ -1,5 +1,7 @@
 using System;
 using Unity.MLAgents;
+using Unity.MLAgents.Actuators;
+using Unity.MLAgents.Sensors;
 using UnityEngine;
 
 /// <summary>
@@ -23,7 +25,7 @@ public class HummingbirdAgent : Agent
     public Camera agentCamera;
 
     [Tooltip("Whether this is training mode or gameplay mode")]
-    public bool trainindMode;
+    public bool trainingMode;
 
     // The rigidbody component of the agent
     new private Rigidbody rigidbody;
@@ -63,7 +65,7 @@ public class HummingbirdAgent : Agent
         flowerArea = GetComponentInParent<FlowerArea>();
 
         // If not training mode, no max step, play forever
-        if (!trainindMode) MaxStep = 0;
+        if (!trainingMode) MaxStep = 0;
     }
 
     /// <summary>
@@ -71,7 +73,7 @@ public class HummingbirdAgent : Agent
     /// </summary>
     public override void OnEpisodeBegin()
     {
-        if (trainindMode)
+        if (trainingMode)
         {
             // Only reset flowers in training mode when there is one agent per area
             flowerArea.ResetFlowers();
@@ -86,7 +88,7 @@ public class HummingbirdAgent : Agent
 
         // Default to spawning the agent in front of a flower
         bool inFrontOfFlower = true;
-        if (trainindMode)
+        if (trainingMode)
         {
             // Spawn in front of flower 50% of the time during training
             inFrontOfFlower = UnityEngine.Random.value > 0.5f;
@@ -97,6 +99,169 @@ public class HummingbirdAgent : Agent
 
         // Recalculate the nearest flower now that the agent has moved
         UpdateNearestFlower();
+    }
+
+    /// <summary>
+    /// <summary>
+    /// Called when an action is received from either the neural network or the player's input.
+    /// 
+    /// The <paramref name="actionBuffers"/> parameter provides the actions as an <see cref="ActionBuffers"/> object.
+    /// The continuous actions are mapped as follows:
+    /// Index 0: Move vector x (-1 = left, +1 = right)
+    /// Index 1: Move vector y (-1 = down, +1 = up)
+    /// Index 2: Move vector z (-1 = backward, +1 = forward)
+    /// Index 3: Pitch angle change (-1 = pitch down, +1 = pitch up)
+    /// Index 4: Yaw angle change (-1 = rotate left, +1 = rotate right)
+    /// </summary>
+    /// <param name="actionBuffers">The actions to take, provided as an ActionBuffers object</param>
+    public override void OnActionReceived(ActionBuffers actionBuffers)
+    {
+        // Don't take actions if the agent is frozen
+        if (frozen) return;
+
+        // Calculate movement vector
+        Vector3 move = new Vector3(
+            actionBuffers.ContinuousActions[0], // x
+            actionBuffers.ContinuousActions[1], // y
+            actionBuffers.ContinuousActions[2]  // z
+        );
+
+        // Add force in the direction of the movement vector
+        rigidbody.AddForce(move * moveForce);
+
+        // Get the current rotation of the agent
+        Vector3 currentRotationVector = transform.rotation.eulerAngles;
+
+        // Calculate pitch and yaw rotations
+        float pitchChange = actionBuffers.ContinuousActions[3];
+        float yawChange = actionBuffers.ContinuousActions[4];
+
+        // Smoothly change the pitch and yaw
+        smoothPitchChange = Mathf.MoveTowards(smoothPitchChange, pitchChange, 2f * Time.fixedDeltaTime);
+        smoothYawChange = Mathf.MoveTowards(smoothYawChange, yawChange, 2f * Time.fixedDeltaTime);
+
+        // Calculate the new pitch and yaw angles based on smoothed values
+        // Clamp pitch to avoid flipping upside down
+        float pitch = currentRotationVector.x + smoothPitchChange * pitchSpeed * Time.fixedDeltaTime;
+        if (pitch > 180f) pitch -= 360f; // Ensure pitch is in the range [-180, 180]
+        pitch = Mathf.Clamp(pitch, -MaxPitchAngle, MaxPitchAngle);
+
+        float yaw = currentRotationVector.y + smoothYawChange * yawSpeed * Time.fixedDeltaTime;
+
+        // Apply the new rotation to the agent
+        transform.rotation = Quaternion.Euler(pitch, yaw, 0f);
+    }
+
+    /// <summary>
+    /// Collect vector observations from the environment for the agent.
+    /// </summary>
+    /// <param name="sensor">The vector sensor</param>
+    public override void CollectObservations(VectorSensor sensor)
+    {
+        // If nearest flower is null, observer an empty array and return early
+        if (nearestFlower == null)
+        {
+            sensor.AddObservation(new float[10]);
+            return;
+        }
+
+        // Observe the agent's local rotation (4 observations: x, y, z, w)
+        sensor.AddObservation(transform.localRotation.normalized);
+
+        // Get a vector from the beak tip to the nearest flower
+        Vector3 toFlower = nearestFlower.FlowerCenterPosition - beakTip.position;
+
+        //Observer a normalize vector pointing to the nearest flower (3 observations: x, y, z)
+        sensor.AddObservation(toFlower.normalized);
+
+        // Observe a dot product that indicates whether the beak is in front of the flower (1 observation)
+        // (+1 means that the beak is directly in front of the flower, -1 means that it is behind)
+        sensor.AddObservation(Vector3.Dot(toFlower.normalized, -nearestFlower.FlowerUpVector.normalized));
+
+        // Observe a dot product that indicates whether the beak is pointing at the flower (1 observation)
+        // (+1 means that the beak is pointing at the flower, -1 means that it is pointing away)
+        sensor.AddObservation(Vector3.Dot(beakTip.forward.normalized, nearestFlower.FlowerUpVector.normalized));
+
+        // Observer the relative distance from the beak tip to the flower (1 observation)
+        sensor.AddObservation(toFlower.magnitude / FlowerArea.AreaDiameter);
+
+        // 10 total observations
+    }
+
+    /// <summary>
+    /// When Behaviour Type is set to "Heuristic Only" on the agent's Behavior Parameters,
+    /// this function will be called. Its return values will be fed into
+    /// <see cref="OnActionReceived(ActionBuffers)"/> instead of using the neural network.
+    /// </summary>
+    /// <param name="actionsOut">An output action array</param>
+    public override void Heuristic(in ActionBuffers actionsOut)
+    {
+        // Create placeholders for all movement/turning actions
+        Vector3 forward = Vector3.zero;
+        Vector3 left = Vector3.zero;
+        Vector3 up = Vector3.zero;
+        float pitch = 0f;
+        float yaw = 0f;
+
+        // Mouse sensitivity for pitch and yaw
+        float mouseSensitivity = 1.0f;
+
+        // Convert keyboard/mouse input to movement and turning actions
+        // All values should be in the range [-1, 1]
+
+        // Forward/backward movement
+        if (Input.GetKey(KeyCode.W)) forward = transform.forward; // Move forward
+        else if (Input.GetKey(KeyCode.S)) forward = -transform.forward; // Move backward
+
+        // Left/right movement
+        if (Input.GetKey(KeyCode.A)) left = -transform.right; // Move left
+        else if (Input.GetKey(KeyCode.D)) left = transform.right; // Move right
+
+        // Up/down movement
+        if (Input.GetKey(KeyCode.Space)) up = transform.up; // Move up
+        else if (Input.GetKey(KeyCode.LeftControl)) up = -transform.up; // Move down
+
+        // Pitching up/down and turning left/right using mouse movement
+        float mouseY = Input.GetAxis("Mouse Y");
+        float mouseX = Input.GetAxis("Mouse X");
+
+        pitch = Mathf.Clamp(mouseY * mouseSensitivity, -1f, 1f); // Pitch up/down
+        yaw = Mathf.Clamp(mouseX * mouseSensitivity, -1f, 1f);   // Turn left/right
+        // Pitching up/down
+        if (Input.GetKey(KeyCode.UpArrow)) pitch = 1f; // Pitch up
+        else if (Input.GetKey(KeyCode.DownArrow)) pitch = -1f; // Pitch down
+
+        // Turning left/right
+        if (Input.GetKey(KeyCode.LeftArrow)) yaw = -1f; // Turn left
+        else if (Input.GetKey(KeyCode.RightArrow)) yaw = 1f; // Turn right
+
+        // Combine the movement vectors and normalize them
+        Vector3 combined = (forward + left + up).normalized;
+
+        // Add the 3 movement values, pitch, and yaw to the actionsOut buffer
+        actionsOut.ContinuousActions.Array[0] = combined.x; // x
+        actionsOut.ContinuousActions.Array[1] = combined.y; // y
+        actionsOut.ContinuousActions.Array[2] = combined.z; // z
+        actionsOut.ContinuousActions.Array[3] = pitch; // Pitch change
+        actionsOut.ContinuousActions.Array[4] = yaw; // Yaw change
+    }
+
+    /// <summary>
+    /// Prevent the agent from moving and taking actions.
+    /// </summary>
+    public void FreezeAgent()
+    {
+
+        Debug.Assert(trainingMode == false, "Freeze/Unfreeze agent is only supported in gameplay mode.");
+        frozen = true;
+        rigidbody.Sleep();
+    }
+
+    public void UnfreezeAgent()
+    {
+        Debug.Assert(trainingMode == false, "Freeze/Unfreeze agent is only supported in gameplay mode.");
+        frozen = false;
+        rigidbody.WakeUp();
     }
 
     /// <summary>
@@ -186,6 +351,40 @@ public class HummingbirdAgent : Agent
                     nearestFlower = flower;
                 }
             }
+        }
+    }
+
+    /// <summary>
+    /// Called when the agent's collider enters a trigger collider.
+    /// </summary>
+    /// <param name="other">The trigger collider</param>
+    private void OnTriggerEnter(Collider other)
+    {
+        TriggerEnterOrStay(other);
+    }
+
+    /// <summary>
+    /// Called when the agent's collider stays in a trigger collider.
+    /// </summary>
+    /// <param name="other">The trigger collider</param>
+    private void OnTriggerStay(Collider other)
+    {
+        TriggerEnterOrStay(other);
+    }
+
+    /// <summary>
+    ///  Handles when the agent's coolider enters or stays in a trigger collider.
+    /// </summary>
+    /// <param name="collider">The trigger collider</param>
+    private void TriggerEnterOrStay(Collider collider)
+    {
+        // Check if the agent is colliding with a nectar collider
+        if (collider.CompareTag("Nectar"))
+        {
+            Vector3 closestPointToBeakTip = collider.ClosestPoint(beakTip.position);
+
+            // Check if the closest point to the beak tip is within the beak tip radius
+            // Note: a collsion with anything but the beak tip will not count
         }
     }
 }
