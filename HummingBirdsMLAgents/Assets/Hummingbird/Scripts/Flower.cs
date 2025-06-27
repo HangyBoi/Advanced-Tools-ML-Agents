@@ -53,7 +53,7 @@ public class Flower : MonoBehaviour
     /// <summary>
     /// Whether the flower has any nectar remaining.
     /// </summary>
-    public bool hasNectar
+    public bool HasNectar
     {
         get
         {
