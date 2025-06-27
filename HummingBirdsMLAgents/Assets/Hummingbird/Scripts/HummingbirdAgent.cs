@@ -373,7 +373,7 @@ public class HummingbirdAgent : Agent
     }
 
     /// <summary>
-    ///  Handles when the agent's coolider enters or stays in a trigger collider.
+    ///  Handles when the agent's colliider enters or stays in a trigger collider.
     /// </summary>
     /// <param name="collider">The trigger collider</param>
     private void TriggerEnterOrStay(Collider collider)
@@ -384,7 +384,70 @@ public class HummingbirdAgent : Agent
             Vector3 closestPointToBeakTip = collider.ClosestPoint(beakTip.position);
 
             // Check if the closest point to the beak tip is within the beak tip radius
-            // Note: a collsion with anything but the beak tip will not count
+            // Note: a collision with anything but the beak tip will not count
+            if (Vector3.Distance(beakTip.position, closestPointToBeakTip) < BeakTipRadius)
+            {
+                // Look up the flower for this nectar collider
+                Flower flower = flowerArea.GetFlowerFromNectar(collider);
+
+                // Attempt to take 0.1 nectar from the flower
+                // Note: this is per fixed timestep, meaning it happens every .02 seconds, or x50 per second
+                float nectarReceived = flower.Feed(.01f);
+
+                // Keep track of the nectar obtained this episode
+                NectarObtained += nectarReceived;
+
+                if (trainingMode)
+                {
+                    // Calculate reward for getting nectar
+                    float bonusReward = .02f * Mathf.Clamp01(Vector3.Dot(transform.forward.normalized, -nearestFlower.FlowerUpVector.normalized));
+                    AddReward(.01f + bonusReward);
+                }
+
+                // If flower is empty, update the nearest flower
+                if (!flower.HasNectar)
+                {
+                    UpdateNearestFlower();
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Called when the agent's collider collides with something solid
+    /// </summary>
+    /// <param name="collision">The collision info</param>
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (trainingMode && collision.collider.CompareTag("Boundary"))
+        {
+            // Collided with the area boundary, give a negative reward (penalty)
+            AddReward(-.5f);
+        }
+    }
+
+    /// <summary>
+    /// Called every frame
+    /// </summary>
+    private void Update()
+    {
+        // Draw a line from the beak tip to the nearest flower
+        if (nearestFlower != null)
+        {
+            Debug.DrawLine(beakTip.position, nearestFlower.FlowerCenterPosition, Color.green);
+        }
+    }
+
+    /// <summary>
+    /// Called every .02 seconds (fixed update)
+    /// </summary>
+    private void FixedUpdate()
+    {
+        // Avoids scenario where neares flower nectar is stolen by opponent agent and not updated
+        if (nearestFlower != null && !nearestFlower.HasNectar)
+        {
+            UpdateNearestFlower();
         }
     }
 }
+
