@@ -46,20 +46,20 @@ public class FlowerArea : MonoBehaviour
     /// </summary>
     public void ResetFlowers()
     {
-        // Rotate each flower around the Y axis and subtly around X and Z axes
+        // First, rotate each plant once.
         foreach (GameObject flowerPlant in flowerPlants)
         {
             float xRotation = UnityEngine.Random.Range(-5f, 5f);
             float yRotation = UnityEngine.Random.Range(-180f, 180f);
             float zRotation = UnityEngine.Random.Range(-5f, 5f);
             flowerPlant.transform.localRotation = Quaternion.Euler(xRotation, yRotation, zRotation);
+        }
 
-            // Reset each flower in the flower plant
-            foreach (Flower flower in Flowers)
-            {
-                flower.gameObject.SetActive(true);
-                flower.ResetFlower();
-            }
+        // Then, reset each flower once.
+        foreach (Flower flower in Flowers)
+        {
+            flower.gameObject.SetActive(true);
+            flower.ResetFlower();
         }
     }
 

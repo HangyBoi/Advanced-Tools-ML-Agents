@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -28,6 +29,9 @@ public class SimulationManager : MonoBehaviour
 
     // List of agents currently active (alive) in the episode.
     private List<HummingbirdAgent> activeAgents;
+
+    // Boolean to track if the current episode is ending.
+    private bool isEpisodeEnding = false;
 
     /// <summary>
     /// Event fired when a new episode begins. Agents can subscribe to this.
@@ -69,9 +73,10 @@ public class SimulationManager : MonoBehaviour
             activeAgents.Remove(deadAgent);
         }
 
-        // Check if the game should end.
-        if (activeAgents.Count <= 1)
+        // Check if the game should end AND if we aren't already ending it
+        if (!isEpisodeEnding && activeAgents.Count <= 1)
         {
+            isEpisodeEnding = true;
             EndEpisode();
         }
     }
@@ -80,6 +85,12 @@ public class SimulationManager : MonoBehaviour
     /// Ends the current episode, assigns rewards, and prepares for the next.
     /// </summary>
     private void EndEpisode()
+    {
+        // Start the end-of-episode sequence as a coroutine
+        StartCoroutine(EndEpisodeRoutine());
+    }
+
+    private IEnumerator EndEpisodeRoutine()
     {
         HummingbirdAgent winner = activeAgents.FirstOrDefault();
         if (winner != null)
@@ -90,18 +101,26 @@ public class SimulationManager : MonoBehaviour
         }
 
         // End the ML-Agents episode for every agent.
-        // This will automatically trigger OnEpisodeBegin() for each agent on the next physics step.
+        // This queues OnEpisodeBegin() for the next physics step.
         foreach (var agent in allAgents)
         {
             agent.EndEpisode();
         }
 
-        // Reset the environment for the next episode
+        // --- THE CRITICAL FIX ---
+        // Wait for the end of the frame. By this point, all physics updates (like
+        // the last agent dying) for this frame are complete.
+        yield return new WaitForEndOfFrame();
+
+        // Now that we are in the next frame, it's safe to reset the environment.
         ResetFlowersForNewEpisode();
 
         // Reset the active agent list for the new episode
         activeAgents.Clear();
         activeAgents.AddRange(allAgents);
+
+        // And finally, reset the flag.
+        isEpisodeEnding = false;
     }
 
     /// <summary>

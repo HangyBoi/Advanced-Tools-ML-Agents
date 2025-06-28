@@ -3,6 +3,13 @@ using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
 using UnityEngine;
 
+// Public enum to choose the strategy in the Inspector
+public enum RewardStrategyType
+{
+    Conservative,
+    Aggressive
+}
+
 /// <summary>
 /// A hummingbird Machinge Learning Agent that can interact with flowers.
 /// </summary>
@@ -24,6 +31,10 @@ public class HummingbirdAgent : Agent
 
     [Tooltip("A multiplier for how much MORE energy is drained based on speed.")]
     public float speedEnergyPenalty = 0.5f;
+
+    [Header("Strategy")]
+    [Tooltip("The reward strategy for this agent.")]
+    public RewardStrategyType rewardStrategyType = RewardStrategyType.Conservative;
 
     [Header("References")]
     [Tooltip("The parent GameObject for all visual/physical parts of the agent.")]
@@ -59,6 +70,9 @@ public class HummingbirdAgent : Agent
     // The maximum energy level of the agent.
     private float maxEnergy;
 
+    // Private field to hold the actual strategy object
+    private IRewardStrategy rewardStrategy;
+
     // Whether the agest is frozen (intentionally not flying)
     private bool frozen = false;
 
@@ -66,6 +80,10 @@ public class HummingbirdAgent : Agent
     /// The amount of ntar the agent has obtained from the flowers this episode.
     /// </summary>
     public float NectarObtained { get; private set; }
+
+    // We need public accessors for the strategy classes to get agent data
+    public Rigidbody Rigidbody => rigidbody;
+    public Flower NearestFlower => nearestFlower;
 
     /// <summary>
     /// Initialize the agent and its components.
@@ -79,6 +97,16 @@ public class HummingbirdAgent : Agent
         if (SimulationManager.Instance != null)
         {
             SimulationManager.Instance.OnEpisodeBegan.AddListener(OnEpisodeBegin);
+        }
+
+        // Instantiate the correct strategy based on the Inspector setting
+        if (rewardStrategyType == RewardStrategyType.Conservative)
+        {
+            rewardStrategy = new ConservativeStrategy();
+        }
+        else if (rewardStrategyType == RewardStrategyType.Aggressive)
+        {
+            rewardStrategy = new AggressiveStrategy();
         }
 
         // In a competitive setting, episodes end by condition, not steps.
@@ -108,6 +136,12 @@ public class HummingbirdAgent : Agent
             UpdateNearestFlower();
         }
 
+        // --- APPLY STRATEGY REWARD ---
+        if (rewardStrategy != null)
+        {
+            AddReward(rewardStrategy.GetFixedUpdateReward(this));
+        }
+
         // --- ENERGY DRAIN LOGIC ---
         // Calculate the speed-based penalty. The faster the agent moves, the higher the penalty.
         float speedPenalty = rigidbody.linearVelocity.magnitude * speedEnergyPenalty;
@@ -130,6 +164,9 @@ public class HummingbirdAgent : Agent
             // Deactivate the agent's GameObject.
             visuals.SetActive(false);
 
+            // Freeze the agent to stop it from moving.
+            FreezeAgent();
+
             // Notify the SimulationManager that this agent has died.
             SimulationManager.Instance.AgentDied(this);
         }
@@ -150,6 +187,8 @@ public class HummingbirdAgent : Agent
         currentEnergy = maxEnergy;
         // --------------------------------------------------
 
+        // Unfreeze the agent if it was frozen
+        UnfreezeAgent();
         // Make sure the agent is active and visible
         visuals.SetActive(true);
 
