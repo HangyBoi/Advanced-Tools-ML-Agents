@@ -1,4 +1,3 @@
-using System;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
@@ -24,14 +23,8 @@ public class HummingbirdAgent : Agent
     [Tooltip("The agent's camera")]
     public Camera agentCamera;
 
-    [Tooltip("Whether this is training mode or gameplay mode")]
-    public bool trainingMode;
-
     // The rigidbody component of the agent
     new private Rigidbody rigidbody;
-
-    // The flower are the agent is in
-    private FlowerArea flowerArea;
 
     // The nearest flower to the agent
     private Flower nearestFlower;
@@ -62,10 +55,16 @@ public class HummingbirdAgent : Agent
     public override void Initialize()
     {
         rigidbody = GetComponent<Rigidbody>();
-        flowerArea = GetComponentInParent<FlowerArea>();
 
-        // If not training mode, no max step, play forever
-        if (!trainingMode) MaxStep = 0;
+        // The agent finds the SimulationManager and subscribes its reset logic to the manager's event.
+        // This is more robust than the manager knowing about every agent's methods.
+        if (SimulationManager.Instance != null)
+        {
+            SimulationManager.Instance.OnEpisodeBegan.AddListener(OnEpisodeBegin);
+        }
+
+        // In a competitive setting, episodes end by condition, not steps.
+        MaxStep = 0;
     }
 
     /// <summary>
@@ -73,12 +72,6 @@ public class HummingbirdAgent : Agent
     /// </summary>
     public override void OnEpisodeBegin()
     {
-        if (trainingMode)
-        {
-            // Only reset flowers in training mode when there is one agent per area
-            flowerArea.ResetFlowers();
-        }
-
         //Reset nectar obtained
         NectarObtained = 0f;
 
@@ -88,11 +81,8 @@ public class HummingbirdAgent : Agent
 
         // Default to spawning the agent in front of a flower
         bool inFrontOfFlower = true;
-        if (trainingMode)
-        {
-            // Spawn in front of flower 50% of the time during training
-            inFrontOfFlower = UnityEngine.Random.value > 0.5f;
-        }
+        // Spawn in front of flower 50% of the time during training
+        inFrontOfFlower = UnityEngine.Random.value > 0.5f;
 
         // Move the ganet to a new random position
         MoveToSafeRandomPosition(inFrontOfFlower);
@@ -252,14 +242,12 @@ public class HummingbirdAgent : Agent
     public void FreezeAgent()
     {
 
-        Debug.Assert(trainingMode == false, "Freeze/Unfreeze agent is only supported in gameplay mode.");
         frozen = true;
         rigidbody.Sleep();
     }
 
     public void UnfreezeAgent()
     {
-        Debug.Assert(trainingMode == false, "Freeze/Unfreeze agent is only supported in gameplay mode.");
         frozen = false;
         rigidbody.WakeUp();
     }
@@ -283,7 +271,7 @@ public class HummingbirdAgent : Agent
             if (inFrontOfFlower)
             {
                 // Pick a random flower from the flower area
-                Flower randomFlower = flowerArea.Flowers[UnityEngine.Random.Range(0, flowerArea.Flowers.Count)];
+                Flower randomFlower = SimulationManager.Instance.flowerArea.Flowers[UnityEngine.Random.Range(0, SimulationManager.Instance.flowerArea.Flowers.Count)];
 
                 // Position 10 to 20 cm in front of the flower
                 float distanceFromFlower = UnityEngine.Random.Range(0.1f, 0.2f);
@@ -305,7 +293,7 @@ public class HummingbirdAgent : Agent
                 Quaternion direction = Quaternion.Euler(0f, UnityEngine.Random.Range(-180f, 180f), 0f);
 
                 // Combine the height, radius and direction to pick a potential position
-                potentialPosition = flowerArea.transform.position + Vector3.up * height + direction * Vector3.forward * radius;
+                potentialPosition = SimulationManager.Instance.flowerArea.transform.position + Vector3.up * height + direction * Vector3.forward * radius;
 
                 // Choose and set random starting pitch and yaw
                 float pitch = UnityEngine.Random.Range(-60f, 60f);
@@ -331,7 +319,7 @@ public class HummingbirdAgent : Agent
     /// </summary>
     public void UpdateNearestFlower()
     {
-        foreach (Flower flower in flowerArea.Flowers)
+        foreach (Flower flower in SimulationManager.Instance.flowerArea.Flowers)
         {
             // If this is the first flower or the current flower is closer than the previous nearest
             if (nearestFlower == null && flower.HasNectar)
@@ -388,7 +376,7 @@ public class HummingbirdAgent : Agent
             if (Vector3.Distance(beakTip.position, closestPointToBeakTip) < BeakTipRadius)
             {
                 // Look up the flower for this nectar collider
-                Flower flower = flowerArea.GetFlowerFromNectar(collider);
+                Flower flower = SimulationManager.Instance.flowerArea.GetFlowerFromNectar(collider);
 
                 // Attempt to take 0.1 nectar from the flower
                 // Note: this is per fixed timestep, meaning it happens every .02 seconds, or x50 per second
@@ -397,12 +385,9 @@ public class HummingbirdAgent : Agent
                 // Keep track of the nectar obtained this episode
                 NectarObtained += nectarReceived;
 
-                if (trainingMode)
-                {
-                    // Calculate reward for getting nectar
-                    float bonusReward = .02f * Mathf.Clamp01(Vector3.Dot(transform.forward.normalized, -nearestFlower.FlowerUpVector.normalized));
-                    AddReward(.01f + bonusReward);
-                }
+                // Calculate reward for getting nectar
+                float bonusReward = .02f * Mathf.Clamp01(Vector3.Dot(transform.forward.normalized, -nearestFlower.FlowerUpVector.normalized));
+                AddReward(.01f + bonusReward);
 
                 // If flower is empty, update the nearest flower
                 if (!flower.HasNectar)
@@ -419,7 +404,7 @@ public class HummingbirdAgent : Agent
     /// <param name="collision">The collision info</param>
     private void OnCollisionEnter(Collision collision)
     {
-        if (trainingMode && collision.collider.CompareTag("Boundary"))
+        if (collision.collider.CompareTag("Boundary"))
         {
             // Collided with the area boundary, give a negative reward (penalty)
             AddReward(-.5f);
