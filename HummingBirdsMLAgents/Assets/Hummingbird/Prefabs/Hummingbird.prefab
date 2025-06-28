@@ -763,7 +763,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 10
+    VectorObservationSize: 11
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 5
@@ -800,9 +800,11 @@ MonoBehaviour:
   moveForce: 2
   pitchSpeed: 100
   yawSpeed: 100
+  maxEnergy: 25
+  energyDrainRate: 1
+  speedEnergyPenalty: 0.5
   beakTip: {fileID: 749827769155012578}
   agentCamera: {fileID: 7281776948428044901}
-  trainingMode: 1
 --- !u!114 &7746521827584813371
 MonoBehaviour:
   m_ObjectHideFlags: 0

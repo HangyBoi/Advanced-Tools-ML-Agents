@@ -8,6 +8,7 @@ using UnityEngine;
 /// </summary>
 public class HummingbirdAgent : Agent
 {
+    [Header("Movement Mechanics")]
     [Tooltip("Force to apply when moving")]
     public float moveForce = 2f;
 
@@ -17,6 +18,17 @@ public class HummingbirdAgent : Agent
     [Tooltip("Speed to rotate around the up axis")]
     public float yawSpeed = 100f;
 
+    [Header("Energy Mechanics")]
+    [Tooltip("The maximum energy level for the agent.")]
+    public float maxEnergy = 25f;
+
+    [Tooltip("The rate at which energy is depleted per second while flying.")]
+    public float energyDrainRate = 1f;
+
+    [Tooltip("A multiplier for how much MORE energy is drained based on speed.")]
+    public float speedEnergyPenalty = 0.5f;
+
+    [Header("References")]
     [Tooltip("Transform at the tip of the beak")]
     public Transform beakTip;
 
@@ -40,6 +52,9 @@ public class HummingbirdAgent : Agent
 
     // Maximum distance from the beak tip to accept nectar collision
     private const float BeakTipRadius = 0.008f;
+
+    // The current energy level of the agent.
+    private float currentEnergy;
 
     // Whether the agest is frozen (intentionally not flying)
     private bool frozen = false;
@@ -74,6 +89,12 @@ public class HummingbirdAgent : Agent
     {
         //Reset nectar obtained
         NectarObtained = 0f;
+
+        // Set current energy to the maximum
+        currentEnergy = maxEnergy;
+
+        // Make sure the agent is active and visible
+        gameObject.SetActive(true);
 
         // Zero out the rigidbody velocity, so the movement stops before a new episode begins
         rigidbody.linearVelocity = Vector3.zero;
@@ -175,7 +196,11 @@ public class HummingbirdAgent : Agent
         // Observer the relative distance from the beak tip to the flower (1 observation)
         sensor.AddObservation(toFlower.magnitude / FlowerArea.AreaDiameter);
 
-        // 10 total observations
+        // Observe the agent's current energy level, normalized (1 observation)
+        // A value of 1 means full energy, 0 means empty.
+        sensor.AddObservation(currentEnergy / maxEnergy);
+
+        // 11 total observations
     }
 
     /// <summary>
@@ -432,6 +457,32 @@ public class HummingbirdAgent : Agent
         if (nearestFlower != null && !nearestFlower.HasNectar)
         {
             UpdateNearestFlower();
+        }
+
+        // --- ENERGY DRAIN LOGIC ---
+        // Calculate the speed-based penalty. The faster the agent moves, the higher the penalty.
+        float speedPenalty = rigidbody.linearVelocity.magnitude * speedEnergyPenalty;
+
+        // Calculate total energy drained this frame
+        float energyToDrain = (energyDrainRate + speedPenalty) * Time.fixedDeltaTime;
+
+        // Drain the energy
+        currentEnergy -= energyToDrain;
+
+        // --- DEATH CHECK ---
+        // If energy has run out, the agent dies.
+        if (currentEnergy <= 0f)
+        {
+            currentEnergy = 0f;
+
+            // Give a large negative reward for dying.
+            AddReward(-1.0f);
+
+            // Deactivate the agent's GameObject.
+            gameObject.SetActive(false);
+
+            // Notify the SimulationManager that this agent has died.
+            SimulationManager.Instance.AgentDied(this);
         }
     }
 }
