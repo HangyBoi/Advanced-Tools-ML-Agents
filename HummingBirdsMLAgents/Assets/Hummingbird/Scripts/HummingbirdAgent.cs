@@ -329,7 +329,7 @@ public class HummingbirdAgent : Agent
     /// <summary>
     /// Updatw the nearest flower to the agent
     /// </summary>
-    private void UpdateNearestFlower()
+    public void UpdateNearestFlower()
     {
         foreach (Flower flower in flowerArea.Flowers)
         {
