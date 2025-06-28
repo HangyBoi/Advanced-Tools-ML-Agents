@@ -15,6 +15,14 @@ public class SimulationManager : MonoBehaviour
     [Tooltip("Reference to the FlowerArea script in the scene.")]
     public FlowerArea flowerArea;
 
+    [Header("Environment Configuration")]
+    [Tooltip("The number of flowers to spawn in the area. If set to 0, it will use all flowers currently in the scene.")]
+    public int flowerCount = 8; // Default to 8 flowers, for example
+
+    [Header("Agent Configuration")]
+    [Tooltip("The starting energy for each agent at the beginning of an episode.")]
+    public float agentInitialEnergy = 25f;
+
     // List of all agents participating in the simulation.
     private List<HummingbirdAgent> allAgents;
 
@@ -39,21 +47,15 @@ public class SimulationManager : MonoBehaviour
         }
 
         // Find all agents that are children of this object's parent.
-        // This ensures a clean hierarchy where the manager and agents are siblings.
         allAgents = new List<HummingbirdAgent>(transform.parent.GetComponentsInChildren<HummingbirdAgent>());
         activeAgents = new List<HummingbirdAgent>();
+        activeAgents.AddRange(allAgents); // Populate for the first episode
     }
 
     private void Start()
     {
-        // Subscribe the manager's own episode logic to the event.
-        OnEpisodeBegan.AddListener(ResetEpisode);
-
-        // Agents subscribe themselves in their own Initialize methods.
-        // This is a more decentralized and robust approach.
-
-        // Trigger the start of the first episode.
-        OnEpisodeBegan.Invoke();
+        // Set up the flowers for the very first episode.
+        ResetFlowersForNewEpisode();
     }
 
     /// <summary>
@@ -75,26 +77,6 @@ public class SimulationManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Resets the environment and all agents for a new episode.
-    /// </summary>
-    private void ResetEpisode()
-    {
-        // Reset the active agent list
-        activeAgents.Clear();
-        activeAgents.AddRange(allAgents);
-
-        // Reset all flowers
-        flowerArea.ResetFlowers();
-
-        // Let all agents know the episode has begun so they can reset themselves.
-        foreach (var agent in allAgents)
-        {
-            // We'll modify the agent to handle this call
-            agent.OnEpisodeBegin();
-        }
-    }
-
-    /// <summary>
     /// Ends the current episode, assigns rewards, and prepares for the next.
     /// </summary>
     private void EndEpisode()
@@ -108,12 +90,32 @@ public class SimulationManager : MonoBehaviour
         }
 
         // End the ML-Agents episode for every agent.
+        // This will automatically trigger OnEpisodeBegin() for each agent on the next physics step.
         foreach (var agent in allAgents)
         {
             agent.EndEpisode();
         }
 
-        // Start a new episode.
-        OnEpisodeBegan.Invoke();
+        // Reset the environment for the next episode
+        ResetFlowersForNewEpisode();
+
+        // Reset the active agent list for the new episode
+        activeAgents.Clear();
+        activeAgents.AddRange(allAgents);
+    }
+
+    /// <summary>
+    /// A helper method to centralize the logic for resetting flowers based on the flowerCount parameter.
+    /// </summary>
+    private void ResetFlowersForNewEpisode()
+    {
+        if (flowerCount > 0)
+        {
+            flowerArea.ResetAndEnableRandomFlowers(flowerCount);
+        }
+        else
+        {
+            flowerArea.ResetFlowers();
+        }
     }
 }

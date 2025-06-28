@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -7,7 +8,7 @@ using UnityEngine;
 public class FlowerArea : MonoBehaviour
 {
     // The diameter of the area where the agent and flowers can be
-    // used for observing relative distance from agent to flower
+    // used for observing relative distance from agent to flower.
     [Tooltip("The diameter of the area where the agent and flowers can be used for observing relative distance from agent to flower")]
     public const float AreaDiameter = 20f;
 
@@ -21,6 +22,24 @@ public class FlowerArea : MonoBehaviour
     /// The list of all flowers in the area, including those attached to flower plants.
     /// </summary>
     public List<Flower> Flowers { get; private set; }
+
+
+    /// <summary>
+    /// Called when the area wakes up.
+    /// </summary>
+    private void Awake()
+    {
+        // Initialize variables
+        flowerPlants = new List<GameObject>();
+        nectarColliderToFlowerDictionary = new Dictionary<Collider, Flower>();
+        Flowers = new List<Flower>();
+    }
+
+    private void Start()
+    {
+        // Find all flowers that are children of this GameObject/Transform
+        FindChildFlowers(transform);
+    }
 
     /// <summary>
     /// Reset flowers in flower plants
@@ -38,8 +57,36 @@ public class FlowerArea : MonoBehaviour
             // Reset each flower in the flower plant
             foreach (Flower flower in Flowers)
             {
+                flower.gameObject.SetActive(true);
                 flower.ResetFlower();
             }
+        }
+    }
+
+    /// <summary>
+    /// Resets a random subset of flowers and disables the rest.
+    /// The parent plant rotation is not changed here to keep experiments consistent.
+    /// </summary>
+    /// <param name="count">The number of flowers to enable.</param>
+    public void ResetAndEnableRandomFlowers(int count)
+    {
+        // Disable all flowers first
+        foreach (var flower in Flowers)
+        {
+            flower.gameObject.SetActive(false);
+        }
+
+        // Check if the count is greater than the total number of available flowers
+        if (count > Flowers.Count) count = Flowers.Count;
+
+        // Shuffle the flowers and take the specified count
+        var shuffledFlowers = Flowers.OrderBy(x => System.Guid.NewGuid()).Take(count);
+
+        // Enable the selected flowers and reset them
+        foreach (var flower in shuffledFlowers)
+        {
+            flower.gameObject.SetActive(true);
+            flower.ResetFlower();
         }
     }
 
@@ -51,23 +98,6 @@ public class FlowerArea : MonoBehaviour
     public Flower GetFlowerFromNectar(Collider nectarCollider)
     {
         return nectarColliderToFlowerDictionary[nectarCollider];
-    }
-
-    /// <summary>
-    /// Called when the area wakes up.
-    /// </summary>
-    private void Awake()
-    {
-        // Initialize variables
-        flowerPlants = new List<GameObject>();
-        nectarColliderToFlowerDictionary = new Dictionary<Collider, Flower>();
-        Flowers = new List<Flower>();
-    }
-
-    private void Start()
-    {
-        // Find all flowers that are children of this GameObject/Transform
-        FindChildFlowers(transform);
     }
 
     /// <summary>

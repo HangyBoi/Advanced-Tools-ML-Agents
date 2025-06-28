@@ -19,9 +19,6 @@ public class HummingbirdAgent : Agent
     public float yawSpeed = 100f;
 
     [Header("Energy Mechanics")]
-    [Tooltip("The maximum energy level for the agent.")]
-    public float maxEnergy = 25f;
-
     [Tooltip("The rate at which energy is depleted per second while flying.")]
     public float energyDrainRate = 1f;
 
@@ -29,6 +26,9 @@ public class HummingbirdAgent : Agent
     public float speedEnergyPenalty = 0.5f;
 
     [Header("References")]
+    [Tooltip("The parent GameObject for all visual/physical parts of the agent.")]
+    public GameObject visuals;
+
     [Tooltip("Transform at the tip of the beak")]
     public Transform beakTip;
 
@@ -55,6 +55,9 @@ public class HummingbirdAgent : Agent
 
     // The current energy level of the agent.
     private float currentEnergy;
+
+    // The maximum energy level of the agent.
+    private float maxEnergy;
 
     // Whether the agest is frozen (intentionally not flying)
     private bool frozen = false;
@@ -83,6 +86,56 @@ public class HummingbirdAgent : Agent
     }
 
     /// <summary>
+    /// Called every frame
+    /// </summary>
+    private void Update()
+    {
+        // Draw a line from the beak tip to the nearest flower
+        if (nearestFlower != null)
+        {
+            Debug.DrawLine(beakTip.position, nearestFlower.FlowerCenterPosition, Color.green);
+        }
+    }
+
+    /// <summary>
+    /// Called every .02 seconds (fixed update)
+    /// </summary>
+    private void FixedUpdate()
+    {
+        // Avoids scenario where neares flower nectar is stolen by opponent agent and not updated
+        if (nearestFlower != null && !nearestFlower.HasNectar)
+        {
+            UpdateNearestFlower();
+        }
+
+        // --- ENERGY DRAIN LOGIC ---
+        // Calculate the speed-based penalty. The faster the agent moves, the higher the penalty.
+        float speedPenalty = rigidbody.linearVelocity.magnitude * speedEnergyPenalty;
+
+        // Calculate total energy drained this frame
+        float energyToDrain = (energyDrainRate + speedPenalty) * Time.fixedDeltaTime;
+
+        // Drain the energy
+        currentEnergy -= energyToDrain;
+
+        // --- DEATH CHECK ---
+        // If energy has run out, the agent dies.
+        if (currentEnergy <= 0f)
+        {
+            currentEnergy = 0f;
+
+            // Give a large negative reward for dying.
+            AddReward(-1.0f);
+
+            // Deactivate the agent's GameObject.
+            visuals.SetActive(false);
+
+            // Notify the SimulationManager that this agent has died.
+            SimulationManager.Instance.AgentDied(this);
+        }
+    }
+
+    /// <summary>
     /// Reset the agent when an episode begins.
     /// </summary>
     public override void OnEpisodeBegin()
@@ -90,11 +143,15 @@ public class HummingbirdAgent : Agent
         //Reset nectar obtained
         NectarObtained = 0f;
 
-        // Set current energy to the maximum
+        // --- PULL CONFIGURATION FROM SIMULATION MANAGER ---
+        // This is the correct pattern. The agent asks the manager for its setup parameters.
+        float initialEnergy = SimulationManager.Instance.agentInitialEnergy;
+        maxEnergy = initialEnergy;
         currentEnergy = maxEnergy;
+        // --------------------------------------------------
 
         // Make sure the agent is active and visible
-        gameObject.SetActive(true);
+        visuals.SetActive(true);
 
         // Zero out the rigidbody velocity, so the movement stops before a new episode begins
         rigidbody.linearVelocity = Vector3.zero;
@@ -403,16 +460,26 @@ public class HummingbirdAgent : Agent
                 // Look up the flower for this nectar collider
                 Flower flower = SimulationManager.Instance.flowerArea.GetFlowerFromNectar(collider);
 
-                // Attempt to take 0.1 nectar from the flower
-                // Note: this is per fixed timestep, meaning it happens every .02 seconds, or x50 per second
-                float nectarReceived = flower.Feed(.01f);
+                // Attempt to take nectar from the flower. The amount is based on the drain rate
+                // to create a balanced system where drinking replenishes energy at a good pace.
+                float nectarReceived = flower.Feed(energyDrainRate * Time.fixedDeltaTime);
 
-                // Keep track of the nectar obtained this episode
-                NectarObtained += nectarReceived;
+                // If we successfully received nectar...
+                if (nectarReceived > 0f)
+                {
+                    // Keep track of the total nectar obtained this episode
+                    NectarObtained += nectarReceived;
 
-                // Calculate reward for getting nectar
-                float bonusReward = .02f * Mathf.Clamp01(Vector3.Dot(transform.forward.normalized, -nearestFlower.FlowerUpVector.normalized));
-                AddReward(.01f + bonusReward);
+                    // REPLENISH ENERGY: This is the critical line that was missing.
+                    // Let's say 1 unit of nectar (which takes about a second to drink)
+                    // should restore a significant amount of energy. A multiplier of 25 feels balanced.
+                    float energyGained = nectarReceived * 25f;
+                    currentEnergy = Mathf.Clamp(currentEnergy + energyGained, 0f, maxEnergy);
+
+                    // REWARD: Give a reward for drinking, plus a bonus for good alignment.
+                    float bonusReward = 0.02f * Mathf.Clamp01(Vector3.Dot(transform.forward.normalized, -flower.FlowerUpVector.normalized));
+                    AddReward(0.01f + bonusReward);
+                }
 
                 // If flower is empty, update the nearest flower
                 if (!flower.HasNectar)
@@ -437,52 +504,37 @@ public class HummingbirdAgent : Agent
     }
 
     /// <summary>
-    /// Called every frame
+    /// Draws a gizmo in the scene view to visualize the agent's energy level.
     /// </summary>
-    private void Update()
+    private void OnDrawGizmos()
     {
-        // Draw a line from the beak tip to the nearest flower
-        if (nearestFlower != null)
+        // Ensure maxEnergy is not zero to avoid division by zero errors.
+        if (maxEnergy > 0f)
         {
-            Debug.DrawLine(beakTip.position, nearestFlower.FlowerCenterPosition, Color.green);
-        }
-    }
+            // Define the colors for the energy bar
+            Color fullColor = Color.green;
+            Color emptyColor = Color.red;
 
-    /// <summary>
-    /// Called every .02 seconds (fixed update)
-    /// </summary>
-    private void FixedUpdate()
-    {
-        // Avoids scenario where neares flower nectar is stolen by opponent agent and not updated
-        if (nearestFlower != null && !nearestFlower.HasNectar)
-        {
-            UpdateNearestFlower();
-        }
+            // Calculate the position for the energy bar above the agent's head
+            Vector3 barPosition = transform.position + Vector3.up * 0.5f; // 0.5 units above the agent's pivot
 
-        // --- ENERGY DRAIN LOGIC ---
-        // Calculate the speed-based penalty. The faster the agent moves, the higher the penalty.
-        float speedPenalty = rigidbody.linearVelocity.magnitude * speedEnergyPenalty;
+            // Calculate the current energy percentage
+            float energyPercent = currentEnergy / maxEnergy;
 
-        // Calculate total energy drained this frame
-        float energyToDrain = (energyDrainRate + speedPenalty) * Time.fixedDeltaTime;
+            // --- Draw the background of the bar (the "empty" part) ---
+            Gizmos.color = Color.gray;
+            Gizmos.DrawCube(barPosition, new Vector3(0.5f, 0.1f, 0.01f)); // A thin, wide bar
 
-        // Drain the energy
-        currentEnergy -= energyToDrain;
+            // --- Draw the foreground of the bar (the "full" part) ---
+            // Lerp the color from red to green based on energy percentage
+            Gizmos.color = Color.Lerp(emptyColor, fullColor, energyPercent);
 
-        // --- DEATH CHECK ---
-        // If energy has run out, the agent dies.
-        if (currentEnergy <= 0f)
-        {
-            currentEnergy = 0f;
+            // Calculate the position and scale of the foreground bar
+            float barWidth = 0.5f;
+            Vector3 forgroundPosition = barPosition - Vector3.right * (barWidth * (1 - energyPercent) / 2f);
+            Vector3 foregroundScale = new Vector3(barWidth * energyPercent, 0.1f, 0.01f);
 
-            // Give a large negative reward for dying.
-            AddReward(-1.0f);
-
-            // Deactivate the agent's GameObject.
-            gameObject.SetActive(false);
-
-            // Notify the SimulationManager that this agent has died.
-            SimulationManager.Instance.AgentDied(this);
+            Gizmos.DrawCube(forgroundPosition, foregroundScale);
         }
     }
 }
