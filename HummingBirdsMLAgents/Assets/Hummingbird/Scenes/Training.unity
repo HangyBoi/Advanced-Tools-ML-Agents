@@ -135,6 +135,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: FloatingIsland (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 4420374660899403437, guid: 423815a9aec87fb48bbb6f0f35a66653, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6604420669641537837, guid: 423815a9aec87fb48bbb6f0f35a66653, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -203,6 +207,10 @@ PrefabInstance:
     - target: {fileID: 4420374660899403437, guid: 423815a9aec87fb48bbb6f0f35a66653, type: 3}
       propertyPath: m_Name
       value: FloatingIsland (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4420374660899403437, guid: 423815a9aec87fb48bbb6f0f35a66653, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6604420669641537837, guid: 423815a9aec87fb48bbb6f0f35a66653, type: 3}
       propertyPath: m_IsActive
@@ -342,6 +350,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: FloatingIsland (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 4420374660899403437, guid: 423815a9aec87fb48bbb6f0f35a66653, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6604420669641537837, guid: 423815a9aec87fb48bbb6f0f35a66653, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -411,6 +423,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: FloatingIsland (6)
       objectReference: {fileID: 0}
+    - target: {fileID: 4420374660899403437, guid: 423815a9aec87fb48bbb6f0f35a66653, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6604420669641537837, guid: 423815a9aec87fb48bbb6f0f35a66653, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -479,6 +495,10 @@ PrefabInstance:
     - target: {fileID: 4420374660899403437, guid: 423815a9aec87fb48bbb6f0f35a66653, type: 3}
       propertyPath: m_Name
       value: FloatingIsland (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4420374660899403437, guid: 423815a9aec87fb48bbb6f0f35a66653, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6604420669641537837, guid: 423815a9aec87fb48bbb6f0f35a66653, type: 3}
       propertyPath: m_IsActive
@@ -868,6 +888,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: FloatingIsland (7)
       objectReference: {fileID: 0}
+    - target: {fileID: 4420374660899403437, guid: 423815a9aec87fb48bbb6f0f35a66653, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6604420669641537837, guid: 423815a9aec87fb48bbb6f0f35a66653, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -936,6 +960,10 @@ PrefabInstance:
     - target: {fileID: 4420374660899403437, guid: 423815a9aec87fb48bbb6f0f35a66653, type: 3}
       propertyPath: m_Name
       value: FloatingIsland (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4420374660899403437, guid: 423815a9aec87fb48bbb6f0f35a66653, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6604420669641537837, guid: 423815a9aec87fb48bbb6f0f35a66653, type: 3}
       propertyPath: m_IsActive
