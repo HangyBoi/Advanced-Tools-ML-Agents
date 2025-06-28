@@ -16,7 +16,7 @@ public class SimulationManager : MonoBehaviour
     public FlowerArea flowerArea;
 
     // List of all agents participating in the simulation.
-    public List<HummingbirdAgent> allAgents;
+    private List<HummingbirdAgent> allAgents;
 
     // List of agents currently active (alive) in the episode.
     private List<HummingbirdAgent> activeAgents;
