@@ -1,0 +1,90 @@
+{
+    "lesson": {
+        "lesson_num": 2
+    },
+    "Hummingbird_Conservative": {
+        "checkpoints": [
+            {
+                "steps": 499968,
+                "file_path": "results\\AgrConserv_Refactored_2M_Pre-Final_v3\\Hummingbird_Conservative\\Hummingbird_Conservative-499968.onnx",
+                "reward": -0.08020484208827838,
+                "creation_time": 1751203217.3133464,
+                "auxillary_file_paths": [
+                    "results\\AgrConserv_Refactored_2M_Pre-Final_v3\\Hummingbird_Conservative\\Hummingbird_Conservative-499968.pt"
+                ]
+            },
+            {
+                "steps": 999960,
+                "file_path": "results\\AgrConserv_Refactored_2M_Pre-Final_v3\\Hummingbird_Conservative\\Hummingbird_Conservative-999960.onnx",
+                "reward": 1.922582094158445,
+                "creation_time": 1751204397.3289554,
+                "auxillary_file_paths": [
+                    "results\\AgrConserv_Refactored_2M_Pre-Final_v3\\Hummingbird_Conservative\\Hummingbird_Conservative-999960.pt"
+                ]
+            },
+            {
+                "steps": 1050048,
+                "file_path": "results\\AgrConserv_Refactored_2M_Pre-Final_v3\\Hummingbird_Conservative\\Hummingbird_Conservative-1050048.onnx",
+                "reward": null,
+                "creation_time": 1751204577.6956336,
+                "auxillary_file_paths": [
+                    "results\\AgrConserv_Refactored_2M_Pre-Final_v3\\Hummingbird_Conservative\\Hummingbird_Conservative-1050048.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 1050048,
+            "file_path": "results\\AgrConserv_Refactored_2M_Pre-Final_v3\\Hummingbird_Conservative.onnx",
+            "reward": null,
+            "creation_time": 1751204577.6956336,
+            "auxillary_file_paths": [
+                "results\\AgrConserv_Refactored_2M_Pre-Final_v3\\Hummingbird_Conservative\\Hummingbird_Conservative-1050048.pt"
+            ]
+        }
+    },
+    "Hummingbird_Aggressive": {
+        "checkpoints": [
+            {
+                "steps": 499968,
+                "file_path": "results\\AgrConserv_Refactored_2M_Pre-Final_v3\\Hummingbird_Aggressive\\Hummingbird_Aggressive-499968.onnx",
+                "reward": 7.680286608636379,
+                "creation_time": 1751203217.3966408,
+                "auxillary_file_paths": [
+                    "results\\AgrConserv_Refactored_2M_Pre-Final_v3\\Hummingbird_Aggressive\\Hummingbird_Aggressive-499968.pt"
+                ]
+            },
+            {
+                "steps": 999960,
+                "file_path": "results\\AgrConserv_Refactored_2M_Pre-Final_v3\\Hummingbird_Aggressive\\Hummingbird_Aggressive-999960.onnx",
+                "reward": 7.669397268976484,
+                "creation_time": 1751204397.3970368,
+                "auxillary_file_paths": [
+                    "results\\AgrConserv_Refactored_2M_Pre-Final_v3\\Hummingbird_Aggressive\\Hummingbird_Aggressive-999960.pt"
+                ]
+            },
+            {
+                "steps": 1050048,
+                "file_path": "results\\AgrConserv_Refactored_2M_Pre-Final_v3\\Hummingbird_Aggressive\\Hummingbird_Aggressive-1050048.onnx",
+                "reward": null,
+                "creation_time": 1751204577.7608724,
+                "auxillary_file_paths": [
+                    "results\\AgrConserv_Refactored_2M_Pre-Final_v3\\Hummingbird_Aggressive\\Hummingbird_Aggressive-1050048.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 1050048,
+            "file_path": "results\\AgrConserv_Refactored_2M_Pre-Final_v3\\Hummingbird_Aggressive.onnx",
+            "reward": null,
+            "creation_time": 1751204577.7608724,
+            "auxillary_file_paths": [
+                "results\\AgrConserv_Refactored_2M_Pre-Final_v3\\Hummingbird_Aggressive\\Hummingbird_Aggressive-1050048.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.7.1+cpu"
+    }
+}
