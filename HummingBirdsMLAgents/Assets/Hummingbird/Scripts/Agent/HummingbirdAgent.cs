@@ -232,10 +232,27 @@ public class HummingbirdAgent : Agent
         rigidbody.linearVelocity = Vector3.zero;
         rigidbody.angularVelocity = Vector3.zero;
 
-        // Default to spawning the agent in front of a flower
-        bool inFrontOfFlower = true;
-        // Spawn in front of flower 50% of the time during training
-        inFrontOfFlower = UnityEngine.Random.value > 0.5f;
+        // Determine the probability of spawning in front of a flower based on the current lesson.
+        float lesson = Academy.Instance.EnvironmentParameters.GetWithDefault("lesson", 0f);
+        float chanceToSpawnInFrontOfFlower = 0f;
+
+        if (lesson < 0.33f)
+        {
+            // Lesson 1: Very high chance to get help.
+            chanceToSpawnInFrontOfFlower = 0.9f; // 90%
+        }
+        else if (lesson < 0.66f)
+        {
+            // Lesson 2: Reduced chance. Agent must learn to search.
+            chanceToSpawnInFrontOfFlower = 0.5f; // 50%
+        }
+        // Lesson 3: No help. The agent is on its own.
+        // chanceToSpawnInFrontOfFlower remains 0f.
+
+        // Decide if this episode will be an "easy start"
+        bool inFrontOfFlower = UnityEngine.Random.value < chanceToSpawnInFrontOfFlower;
+        // ------------------------------------
+
 
         // Move the agent to a new random position
         MoveToSafeRandomPosition(inFrontOfFlower);
@@ -441,20 +458,41 @@ public class HummingbirdAgent : Agent
         while (!safePositionFound && attemptsRemaining > 0)
         {
             attemptsRemaining--;
-            if (inFrontOfFlower && flowerList.Count > 0)
+            if (inFrontOfFlower)
             {
-                // Pick a random flower from the flower area
-                Flower randomFlower = flowerList[UnityEngine.Random.Range(0, flowerList.Count)];
+                // First, create a temporary list of only the flowers that are active and have nectar.
+                List<Flower> activeFlowers = new List<Flower>();
+                foreach (Flower flower in flowerArea.Flowers)
+                {
+                    if (flower.gameObject.activeInHierarchy && flower.HasNectar)
+                    {
+                        activeFlowers.Add(flower);
+                    }
+                }
 
-                // Position 10 to 20 cm in front of the flower
-                float distanceFromFlower = UnityEngine.Random.Range(0.1f, 0.2f);
-                potentialPosition = randomFlower.transform.position + randomFlower.FlowerUpVector * distanceFromFlower;
+                // If we found at least one active flower, spawn in front of it.
+                if (activeFlowers.Count > 0)
+                {
+                    // Pick a random flower from our new list of ACTIVE flowers
+                    Flower randomFlower = activeFlowers[UnityEngine.Random.Range(0, activeFlowers.Count)];
 
-                // Point the beak at the flower (bird's head is center of transform)
-                Vector3 toFlower = randomFlower.FlowerCenterPosition - transform.position;
-                potentialRotation = Quaternion.LookRotation(toFlower, Vector3.up);
+                    // Position 10 to 20 cm in front of the flower
+                    float distanceFromFlower = UnityEngine.Random.Range(0.1f, 0.2f);
+                    potentialPosition = randomFlower.transform.position + randomFlower.FlowerUpVector * distanceFromFlower;
+
+                    // Point the beak at the flower
+                    Vector3 toFlower = randomFlower.FlowerCenterPosition - potentialPosition; // Use potentialPosition for accuracy
+                    potentialRotation = Quaternion.LookRotation(toFlower, Vector3.up);
+                }
+                else
+                {
+                    // Fallback: if no active flowers were found, just do a random spawn for this attempt.
+                    inFrontOfFlower = false; // This will force the 'else' block below to run
+                }
             }
-            else
+
+            // This 'else' block now handles both "random spawn" episodes and the fallback case above.
+            if (!inFrontOfFlower)
             {
                 // Pick a random height from the ground
                 float height = UnityEngine.Random.Range(1.2f, 2.5f);
