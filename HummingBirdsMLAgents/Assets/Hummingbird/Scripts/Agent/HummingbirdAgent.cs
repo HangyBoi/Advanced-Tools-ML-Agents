@@ -232,7 +232,8 @@ public class HummingbirdAgent : Agent
         rigidbody.linearVelocity = Vector3.zero;
         rigidbody.angularVelocity = Vector3.zero;
 
-        // Determine the probability of spawning in front of a flower based on the current lesson.
+        // Determine the probability of spawning in front of a flower based on the current
+        // .
         float lesson = Academy.Instance.EnvironmentParameters.GetWithDefault("lesson", 0f);
         float chanceToSpawnInFrontOfFlower = 0f;
 

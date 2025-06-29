@@ -30,9 +30,8 @@ public class SimulationManager : MonoBehaviour
         }
 
         Instance = this;
-        // DontDestroyOnLoad(this.gameObject); // Optional: uncomment if you switch between scenes.
-
-        allAgents = new List<HummingbirdAgent>(FindObjectsOfType<HummingbirdAgent>());
+        // Finds all the agents in the scene and stores them in a list.
+        allAgents = new List<HummingbirdAgent>(FindObjectsByType<HummingbirdAgent>(FindObjectsSortMode.InstanceID));
         // Sort the list to ensure a consistent "first" agent
         allAgents = allAgents.OrderBy(a => a.gameObject.GetInstanceID()).ToList();
     }
@@ -46,36 +45,36 @@ public class SimulationManager : MonoBehaviour
         // Get the current lesson number from the Academy
         float lesson = Academy.Instance.EnvironmentParameters.GetWithDefault("lesson", 0f);
 
-        // Announce the new lesson in the console for easy debugging
         Debug.Log($"<color=cyan>--- Applying Lesson: {lesson} ---</color>");
 
-        // Let's assume ~180 total flowers per island.
-        if (lesson < 0.33f)
+        // This directly matches the 'value' fields in the YAML configuration.
+
+        if (lesson == 0.0f)
         {
             // === LESSON 1: "Abundant Paradise" ===
             // Goal: Teach the absolute basic link: FLOWER -> ENERGY -> SURVIVAL
-            // Over half the flowers are active. The world is saturated with resources.
-            flowerCount = 100; // Approx. 55% of flowers are active. Very high chance of success.
+            // The world is saturated with resources.
+            flowerCount = 240; // Approx. 66.7% of flowers are active. Very high chance of success.
             agentInitialEnergy = 50; // Very generous energy. Agents can make many mistakes.
-            Debug.Log("<color=green>Difficulty set to EASY: 100 Flowers, 50 Energy</color>");
+            Debug.Log("<color=green>Difficulty set to EASY: 240 Flowers, 50 Energy</color>");
         }
-        else if (lesson < 0.66f)
+        else if (lesson == 0.5f)
         {
             // === LESSON 2: "The Search Begins" ===
             // Goal: Teach agents to actively SEARCH for flowers, not just wander.
             // The density is lowered significantly, requiring purposeful flight.
-            flowerCount = 45; // Approx. 25% of flowers active. Searching is now a required skill.
+            flowerCount = 120; // Approx. 33.3% of flowers active. Searching is now a required skill.
             agentInitialEnergy = 35; // Less energy, mistakes are more costly.
-            Debug.Log("<color=orange>Difficulty set to MEDIUM: 45 Flowers, 35 Energy</color>");
+            Debug.Log("<color=orange>Difficulty set to MEDIUM: 120 Flowers, 35 Energy</color>");
         }
-        else
+        else // This will catch lesson == 1.0f and any other value
         {
             // === LESSON 3: "Competitive Scarcity" ===
             // Goal: Teach agents to compete and manage energy efficiently.
             // This is our target difficulty for the final evaluation. Flowers are a contested resource.
-            flowerCount = 20; // Approx. 11% active. This is now a truly competitive environment.
+            flowerCount = 60; // Approx. 16.7% active. This is now a truly competitive environment.
             agentInitialEnergy = 25; // Low starting energy. Every action matters.
-            Debug.Log("<color=red>Difficulty set to HARD: 20 Flowers, 25 Energy</color>");
+            Debug.Log("<color=red>Difficulty set to HARD: 60 Flowers, 25 Energy</color>");
         }
     }
 
@@ -156,7 +155,7 @@ public class SimulationManager : MonoBehaviour
             }
             // ----------------
         }
-        else 
+        else
         {
             Debug.Log("<color=orange>Episode ended in a draw or with no survivors.</color>");
         }
@@ -178,7 +177,7 @@ public class SimulationManager : MonoBehaviour
             // Pick the first agent from the master list to do it.
             allAgents[0].EndEpisode();
         }
-        
+
         Debug.Log($"<color=magenta>EndEpisodeRoutine has finished. Called EndEpisode() to trigger the next round.</color>");
     }
 }
