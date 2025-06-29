@@ -164,13 +164,14 @@ public class HummingbirdAgent : Agent
             // Give a large negative reward for dying.
             AddReward(-1.0f);
 
-            // Deactivate the agent's GameObject.
-            visuals.SetActive(false);
-
             // Freeze the agent to stop it from moving.
             FreezeAgent();
 
+            // Deactivate the agent's GameObject.
+            visuals.SetActive(false);
+
             // Notify the SimulationManager that this agent has died.
+            Debug.Log($"<color=red>{gameObject.name} has died and is reporting to the manager.</color>");
             SimulationManager.Instance.AgentDied(this);
         }
     }
@@ -191,15 +192,15 @@ public class HummingbirdAgent : Agent
 
         // --- PULL CONFIGURATION FROM SIMULATION MANAGER ---
         // This is the correct pattern. The agent asks the manager for its setup parameters.
-        float initialEnergy = SimulationManager.Instance.agentInitialEnergy;
-        maxEnergy = initialEnergy;
+        maxEnergy = SimulationManager.Instance.agentInitialEnergy;
         currentEnergy = maxEnergy;
         // --------------------------------------------------
 
-        // Unfreeze the agent if it was frozen
-        UnfreezeAgent();
         // Make sure the agent is active and visible
         visuals.SetActive(true);
+        // Unfreeze the agent if it was frozen
+        UnfreezeAgent();
+
 
         // Zero out the rigidbody velocity, so the movement stops before a new episode begins
         rigidbody.linearVelocity = Vector3.zero;
@@ -210,7 +211,7 @@ public class HummingbirdAgent : Agent
         // Spawn in front of flower 50% of the time during training
         inFrontOfFlower = UnityEngine.Random.value > 0.5f;
 
-        // Move the ganet to a new random position
+        // Move the agent to a new random position
         MoveToSafeRandomPosition(inFrontOfFlower);
 
         // Recalculate the nearest flower now that the agent has moved
@@ -373,18 +374,22 @@ public class HummingbirdAgent : Agent
     {
         Debug.Assert(frozen == false, "Agent is already frozen");
         frozen = true;
-        rigidbody.Sleep();
         // Also disable the decision requester to stop the brain from running.
         GetComponent<DecisionRequester>().enabled = false;
+        rigidbody.Sleep();
+
     }
 
     public void UnfreezeAgent()
     {
         Debug.Assert(frozen == true, "Agent is already unfrozen");
-        frozen = false;
-        rigidbody.WakeUp();
-        // Re-enable the decision requester.
-        GetComponent<DecisionRequester>().enabled = true;
+        if (frozen)
+        {
+            frozen = false;
+            // Re-enable the decision requester.
+            GetComponent<DecisionRequester>().enabled = true;
+            rigidbody.WakeUp();
+        }
     }
 
     /// <summary>

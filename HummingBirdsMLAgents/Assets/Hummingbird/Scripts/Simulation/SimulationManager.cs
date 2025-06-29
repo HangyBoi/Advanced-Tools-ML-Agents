@@ -2,149 +2,107 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Events;
 
-/// <summary>
-/// Manages the overall simulation state for the competitive multi-agent environment.
-/// This includes tracking agents, checking win conditions, and managing episode lifecycles.
-/// </summary>
 public class SimulationManager : MonoBehaviour
 {
-    // Singleton instance to allow easy access from other scripts.
     public static SimulationManager Instance { get; private set; }
 
-    [Tooltip("Reference to the FlowerArea script in the scene.")]
     public FlowerArea flowerArea;
-
-    [Header("Environment Configuration")]
-    [Tooltip("The number of flowers to spawn in the area. If set to 0, it will use all flowers currently in the scene.")]
-    public int flowerCount = 8; // Default to 8 flowers, for example
-
-    [Header("Agent Configuration")]
-    [Tooltip("The starting energy for each agent at the beginning of an episode.")]
+    public int flowerCount = 8;
     public float agentInitialEnergy = 25f;
 
-    // List of all agents participating in the simulation.
     private List<HummingbirdAgent> allAgents;
-
-    // List of agents currently active (alive) in the episode.
     private List<HummingbirdAgent> activeAgents;
-
-    // Boolean to track if the current episode is ending.
     private bool isEpisodeEnding = false;
 
     private void Awake()
     {
-        // Singleton pattern implementation
+        // --- DIAGNOSTIC LOGGING ---
+        Debug.Log($"<color=cyan>SimulationManager Awake() called by object: {this.gameObject.name}, Instance ID: {this.GetInstanceID()}</color>");
+
         if (Instance != null && Instance != this)
         {
+            // --- DIAGNOSTIC LOGGING ---
+            Debug.LogError($"<color=orange>DUPLICATE SimulationManager DETECTED! Destroying this instance ({this.GetInstanceID()}). The original is {Instance.GetInstanceID()}.</color>");
             Destroy(this.gameObject);
-        }
-        else
-        {
-            Instance = this;
+            return; // Stop execution here
         }
 
-        // Find all agents that are children of this object's parent.
-        allAgents = new List<HummingbirdAgent>(transform.parent.GetComponentsInChildren<HummingbirdAgent>());
-        activeAgents = new List<HummingbirdAgent>();
-        activeAgents.AddRange(allAgents); // Populate for the first episode
+        Instance = this;
+        // DontDestroyOnLoad(this.gameObject); // Optional: uncomment if you switch between scenes.
+
+        allAgents = new List<HummingbirdAgent>(FindObjectsOfType<HummingbirdAgent>());
     }
 
     private void Start()
     {
-        // Set up the flowers for the very first episode.
-        ResetFlowersForNewEpisode();
+        Debug.Log($"<color=cyan>SimulationManager Start() on Instance ID: {this.GetInstanceID()}. Starting first episode.</color>");
+        StartNewEpisode();
     }
 
-    /// <summary>
-    /// Called by an agent when it dies.
-    /// </summary>
-    /// <param name="deadAgent">The agent that has died.</param>
     public void AgentDied(HummingbirdAgent deadAgent)
     {
+        // --- DIAGNOSTIC LOGGING ---
+        Debug.Log($"<color=yellow>AgentDied reported to Manager ID: {this.GetInstanceID()}. Current active agents: {activeAgents.Count}. isEpisodeEnding: {isEpisodeEnding}</color>");
+
+        if (isEpisodeEnding) return;
+
         if (activeAgents.Contains(deadAgent))
         {
             activeAgents.Remove(deadAgent);
         }
 
-        // Check for end condition ONLY if an episode isn't already ending.
-        if (!isEpisodeEnding)
+        if (activeAgents.Count <= 1)
         {
-            if (activeAgents.Count == 1)
-            {
-                // WIN CONDITION MET!
-                isEpisodeEnding = true;
-                HummingbirdAgent winner = activeAgents[0]; // The last one remaining is the winner
-                EndEpisode(winner);
-            }
-            else if (activeAgents.Count == 0)
-            {
-                // DRAW CONDITION MET!
-                isEpisodeEnding = true;
-                EndEpisode(null); // No winner
-            }
+            isEpisodeEnding = true;
+            HummingbirdAgent winner = activeAgents.FirstOrDefault();
+
+            // --- DIAGNOSTIC LOGGING ---
+            Debug.Log($"<color=yellow>WIN CONDITION MET. Manager ID: {this.GetInstanceID()} is starting EndEpisodeRoutine.</color>");
+            StartCoroutine(EndEpisodeRoutine(winner));
         }
     }
 
-    /// <summary>
-    /// Ends the current episode, assigns rewards, and prepares for the next.
-    /// </summary>
-    /// <param name="winner">The winning agent, or null for a draw.</param>
-    private void EndEpisode(HummingbirdAgent winner)
+    private void StartNewEpisode()
     {
-        // Start the end-of-episode sequence, passing the winner information along.
-        StartCoroutine(EndEpisodeRoutine(winner));
+        Debug.Log($"<color=lime>--- StartNewEpisode CALLED on Manager ID: {this.GetInstanceID()} ---</color>");
+        isEpisodeEnding = false;
+
+        if (flowerArea.Flowers == null || flowerArea.Flowers.Count == 0)
+        {
+            Debug.LogError("Flower list is empty! Cannot reset flowers.");
+            return;
+        }
+
+        if (flowerCount > 0) { flowerArea.ResetAndEnableRandomFlowers(flowerCount); }
+        else { flowerArea.ResetFlowers(); }
+
+        activeAgents = new List<HummingbirdAgent>(allAgents);
+
+        Debug.Log($"<color=lime>--- New Episode has been set up. Active agents: {activeAgents.Count} ---</color>");
     }
 
     private IEnumerator EndEpisodeRoutine(HummingbirdAgent winner)
     {
+        // --- DIAGNOSTIC LOGGING ---
+        Debug.Log($"<color=magenta>EndEpisodeRoutine has BEGUN on Manager ID: {this.GetInstanceID()}.</color>");
+
         if (winner != null)
         {
-            Debug.Log($"Winner is {winner.name}!");
-            // This is the CRITICAL terminal reward for success.
+            Debug.Log($"<color=green>Winner is {winner.name}! Assigning +1.0 reward.</color>");
             winner.AddReward(1.0f);
         }
-        else
-        {
-            // This log should now only appear when the last two agents die at the same time.
-            Debug.Log("Episode ended in a draw.");
-        }
+        else { Debug.Log("<color=orange>Episode ended in a draw.</color>"); }
 
-        // Give a penalty to all agents who died. This is their terminal reward for failure.
-        // The winner is still in the 'allAgents' list, but it did not die, so it won't have a -1 penalty.
-
-        // End the ML-Agents episode for every agent in the original list.
         foreach (var agent in allAgents)
         {
             agent.EndEpisode();
         }
 
-        // Wait for the next frame to safely reset the environment.
         yield return new WaitForEndOfFrame();
 
-        ResetFlowersForNewEpisode();
-
-        // Reset the active agent list for the new episode
-        activeAgents.Clear();
-        activeAgents.AddRange(allAgents);
-
-        // And finally, reset the flag, allowing a new episode to end.
-        isEpisodeEnding = false;
-    }
-
-    /// <summary>
-    /// A helper method to centralize the logic for resetting flowers based on the flowerCount parameter.
-    /// </summary>
-    private void ResetFlowersForNewEpisode()
-    {
-        if (flowerCount > 0)
-        {
-            flowerArea.ResetAndEnableRandomFlowers(flowerCount);
-        }
-        else
-        {
-            flowerArea.ResetFlowers();
-        }
+        // --- DIAGNOSTIC LOGGING ---
+        Debug.Log($"<color=magenta>EndEpisodeRoutine has finished waiting and will now start a new episode. Manager ID: {this.GetInstanceID()}</color>");
+        StartNewEpisode();
     }
 }
