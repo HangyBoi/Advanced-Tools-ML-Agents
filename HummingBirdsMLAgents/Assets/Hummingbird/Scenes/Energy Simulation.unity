@@ -3284,6 +3284,10 @@ PrefabInstance:
       propertyPath: MaxStep
       value: 5000
       objectReference: {fileID: 0}
+    - target: {fileID: 6419566238292468790, guid: fab9f74aca807d24aaa4f2a7bbfc8f19, type: 3}
+      propertyPath: m_Model
+      value: 
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -9558,7 +9562,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5111517378405020085, guid: 3e7bb153544473a40baea7d672ec5168, type: 3}
       propertyPath: MaxStep
-      value: 0
+      value: 5000
+      objectReference: {fileID: 0}
+    - target: {fileID: 5226731389352935366, guid: 3e7bb153544473a40baea7d672ec5168, type: 3}
+      propertyPath: m_Model
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -16668,6 +16676,10 @@ PrefabInstance:
       propertyPath: MaxStep
       value: 5000
       objectReference: {fileID: 0}
+    - target: {fileID: 6419566238292468790, guid: fab9f74aca807d24aaa4f2a7bbfc8f19, type: 3}
+      propertyPath: m_Model
+      value: 
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -17867,7 +17879,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5111517378405020085, guid: 3e7bb153544473a40baea7d672ec5168, type: 3}
       propertyPath: MaxStep
-      value: 0
+      value: 5000
+      objectReference: {fileID: 0}
+    - target: {fileID: 5226731389352935366, guid: 3e7bb153544473a40baea7d672ec5168, type: 3}
+      propertyPath: m_Model
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -18858,11 +18874,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4359217200292944680, guid: 3e7bb153544473a40baea7d672ec5168, type: 3}
       propertyPath: m_Name
-      value: Hummingbird_Conservative (2) A
+      value: Hummingbird_Conservative (3) A
       objectReference: {fileID: 0}
     - target: {fileID: 5111517378405020085, guid: 3e7bb153544473a40baea7d672ec5168, type: 3}
       propertyPath: MaxStep
-      value: 0
+      value: 5000
+      objectReference: {fileID: 0}
+    - target: {fileID: 5226731389352935366, guid: 3e7bb153544473a40baea7d672ec5168, type: 3}
+      propertyPath: m_Model
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -28104,12 +28124,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5111517378405020085, guid: 3e7bb153544473a40baea7d672ec5168, type: 3}
       propertyPath: MaxStep
-      value: 0
+      value: 5000
       objectReference: {fileID: 0}
     - target: {fileID: 5226731389352935366, guid: 3e7bb153544473a40baea7d672ec5168, type: 3}
       propertyPath: m_Model
       value: 
-      objectReference: {fileID: 5022602860645237092, guid: 19730245c745d5c4b87b1515130f2697, type: 3}
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -30236,6 +30256,10 @@ PrefabInstance:
     - target: {fileID: 6300593070078536261, guid: fab9f74aca807d24aaa4f2a7bbfc8f19, type: 3}
       propertyPath: MaxStep
       value: 5000
+      objectReference: {fileID: 0}
+    - target: {fileID: 6419566238292468790, guid: fab9f74aca807d24aaa4f2a7bbfc8f19, type: 3}
+      propertyPath: m_Model
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -36115,7 +36139,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5111517378405020085, guid: 3e7bb153544473a40baea7d672ec5168, type: 3}
       propertyPath: MaxStep
-      value: 0
+      value: 5000
+      objectReference: {fileID: 0}
+    - target: {fileID: 5226731389352935366, guid: 3e7bb153544473a40baea7d672ec5168, type: 3}
+      propertyPath: m_Model
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -37333,6 +37361,10 @@ PrefabInstance:
     - target: {fileID: 6300593070078536261, guid: fab9f74aca807d24aaa4f2a7bbfc8f19, type: 3}
       propertyPath: MaxStep
       value: 5000
+      objectReference: {fileID: 0}
+    - target: {fileID: 6419566238292468790, guid: fab9f74aca807d24aaa4f2a7bbfc8f19, type: 3}
+      propertyPath: m_Model
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -38574,7 +38606,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6300593070078536261, guid: fab9f74aca807d24aaa4f2a7bbfc8f19, type: 3}
       propertyPath: MaxStep
-      value: 0
+      value: 5000
+      objectReference: {fileID: 0}
+    - target: {fileID: 6419566238292468790, guid: fab9f74aca807d24aaa4f2a7bbfc8f19, type: 3}
+      propertyPath: m_Model
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -39516,7 +39552,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6300593070078536261, guid: fab9f74aca807d24aaa4f2a7bbfc8f19, type: 3}
       propertyPath: MaxStep
-      value: 0
+      value: 5000
+      objectReference: {fileID: 0}
+    - target: {fileID: 6419566238292468790, guid: fab9f74aca807d24aaa4f2a7bbfc8f19, type: 3}
+      propertyPath: m_Model
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -41384,7 +41424,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6300593070078536261, guid: fab9f74aca807d24aaa4f2a7bbfc8f19, type: 3}
       propertyPath: MaxStep
-      value: 0
+      value: 5000
+      objectReference: {fileID: 0}
+    - target: {fileID: 6419566238292468790, guid: fab9f74aca807d24aaa4f2a7bbfc8f19, type: 3}
+      propertyPath: m_Model
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -42608,12 +42652,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5111517378405020085, guid: 3e7bb153544473a40baea7d672ec5168, type: 3}
       propertyPath: MaxStep
-      value: 0
+      value: 5000
       objectReference: {fileID: 0}
     - target: {fileID: 5226731389352935366, guid: 3e7bb153544473a40baea7d672ec5168, type: 3}
       propertyPath: m_Model
       value: 
-      objectReference: {fileID: 5022602860645237092, guid: 19730245c745d5c4b87b1515130f2697, type: 3}
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -42875,8 +42919,8 @@ MonoBehaviour:
   - {fileID: 1733346984}
   - {fileID: 1316439549}
   - {fileID: 1423912592}
-  flowerCount: 20
-  agentInitialEnergy: 20
+  flowerCount: 12
+  agentInitialEnergy: 25
 --- !u!1001 &2021334603
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -42931,12 +42975,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5111517378405020085, guid: 3e7bb153544473a40baea7d672ec5168, type: 3}
       propertyPath: MaxStep
-      value: 0
+      value: 5000
       objectReference: {fileID: 0}
     - target: {fileID: 5226731389352935366, guid: 3e7bb153544473a40baea7d672ec5168, type: 3}
       propertyPath: m_Model
       value: 
-      objectReference: {fileID: 5022602860645237092, guid: 19730245c745d5c4b87b1515130f2697, type: 3}
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -43435,12 +43479,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5111517378405020085, guid: 3e7bb153544473a40baea7d672ec5168, type: 3}
       propertyPath: MaxStep
-      value: 0
+      value: 5000
       objectReference: {fileID: 0}
     - target: {fileID: 5226731389352935366, guid: 3e7bb153544473a40baea7d672ec5168, type: 3}
       propertyPath: m_Model
       value: 
-      objectReference: {fileID: 5022602860645237092, guid: 19730245c745d5c4b87b1515130f2697, type: 3}
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -43803,7 +43847,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6300593070078536261, guid: fab9f74aca807d24aaa4f2a7bbfc8f19, type: 3}
       propertyPath: MaxStep
-      value: 0
+      value: 5000
+      objectReference: {fileID: 0}
+    - target: {fileID: 6419566238292468790, guid: fab9f74aca807d24aaa4f2a7bbfc8f19, type: 3}
+      propertyPath: m_Model
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -42,3 +42,28 @@ behaviors:
     max_steps: 2000000
     time_horizon: 64
     summary_freq: 10000
+
+# --- NEW CURRICULUM SECTION ---
+environment_parameters:
+  lesson:
+    curriculum:
+      - name: Lesson0_Easy         # Start with an easy environment
+        completion_criteria:
+          measure: reward
+          behavior: Hummingbird_Aggressive # We'll use the faster learner to advance
+          signal_smoothing: true
+          min_lesson_length: 100
+          threshold: -0.25         # Advance when avg reward is better than -0.25
+        value: 0.0               # Corresponds to lesson 0 in C#
+
+      - name: Lesson1_Medium        # Move to a medium environment
+        completion_criteria:
+          measure: reward
+          behavior: Hummingbird_Aggressive
+          signal_smoothing: true
+          min_lesson_length: 100
+          threshold: 0.2           # Advance when avg reward is positive
+        value: 0.5               # Corresponds to lesson 0.5 in C#
+
+      - name: Lesson2_Hard          # The final, target environment
+        value: 1.0               # Corresponds to lesson 1.0 in C#

@@ -39,8 +39,35 @@ public class SimulationManager : MonoBehaviour
 
     private void Start()
     {
-        // On the very first run, we need to set up the episode.
-        OnNewEpisodeBegan();
+        // Subscribe to lesson changes
+        Academy.Instance.OnEnvironmentReset += ApplyCurriculum;
+    }
+
+    private void ApplyCurriculum()
+    {
+        // Get the current lesson number from the Academy
+        float lesson = Academy.Instance.EnvironmentParameters.GetWithDefault("lesson", 0f);
+
+        // This is where you set your parameters based on the lesson number
+        // Example: As the lesson number increases, we DECREASE the number of flowers.
+        if (lesson < 0.33f)
+        {
+            // Lesson 1: Easy Mode
+            flowerCount = 24; // Abundant flowers
+            agentInitialEnergy = 40; // More starting energy
+        }
+        else if (lesson < 0.66f)
+        {
+            // Lesson 2: Medium Mode
+            flowerCount = 16;
+            agentInitialEnergy = 30;
+        }
+        else
+        {
+            // Lesson 3: Hard Mode (your target difficulty)
+            flowerCount = 12;
+            agentInitialEnergy = 25;
+        }
     }
 
     /// <summary>
