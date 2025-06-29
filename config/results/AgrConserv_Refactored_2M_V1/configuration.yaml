@@ -114,7 +114,7 @@ environment_parameters:
     - value:
         sampler_type: constant
         sampler_parameters:
-          seed: 1560
+          seed: 5168
           value: 0.0
       name: Lesson0_Easy
       completion_criteria:
@@ -127,7 +127,7 @@ environment_parameters:
     - value:
         sampler_type: constant
         sampler_parameters:
-          seed: 1561
+          seed: 5169
           value: 0.5
       name: Lesson1_Medium
       completion_criteria:
@@ -140,12 +140,12 @@ environment_parameters:
     - value:
         sampler_type: constant
         sampler_parameters:
-          seed: 1562
+          seed: 5170
           value: 1.0
       name: Lesson2_Hard
       completion_criteria: null
 checkpoint_settings:
-  run_id: Curriculum_2M_v1
+  run_id: AgrConserv_Refactored_2M_V1
   initialize_from: null
   load_model: false
   resume: false

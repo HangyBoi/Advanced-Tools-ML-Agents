@@ -316,7 +316,7 @@ public class HummingbirdAgent : Agent
 
         // Observe a dot product that indicates whether the beak is pointing at the flower (1 observation)
         // (+1 means that the beak is pointing at the flower, -1 means that it is pointing away)
-        sensor.AddObservation(Vector3.Dot(beakTip.forward.normalized, nearestFlower.FlowerUpVector.normalized));
+        sensor.AddObservation(Vector3.Dot(beakTip.forward.normalized, -nearestFlower.FlowerUpVector.normalized));
 
         // Observer the relative distance from the beak tip to the flower (1 observation)
         sensor.AddObservation(toFlower.magnitude / FlowerArea.AreaDiameter);
@@ -571,9 +571,11 @@ public class HummingbirdAgent : Agent
                     float energyGained = nectarReceived * 25f;
                     currentEnergy = Mathf.Clamp(currentEnergy + energyGained, 0f, maxEnergy);
 
-                    // REWARD: Give a reward for drinking, plus a bonus for good alignment.
-                    float bonusReward = 0.02f * Mathf.Clamp01(Vector3.Dot(transform.forward.normalized, -flower.FlowerUpVector.normalized));
-                    AddReward(0.01f + bonusReward);
+                    // REWARD: Give a MUCH BIGGER reward for drinking.
+                    // The bonus for alignment is good, but the base reward must be significant.
+                    float baseReward = 0.1f; // Increased from 0.01f to 0.1f (10x bigger!)
+                    float bonusReward = 0.1f * Mathf.Clamp01(Vector3.Dot(transform.forward.normalized, -flower.FlowerUpVector.normalized));
+                    AddReward(baseReward + bonusReward);
                 }
 
                 // If flower is empty, update the nearest flower

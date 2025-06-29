@@ -1,0 +1,90 @@
+{
+    "lesson": {
+        "lesson_num": 0
+    },
+    "Hummingbird_Aggressive": {
+        "checkpoints": [
+            {
+                "steps": 499968,
+                "file_path": "results\\AgrConserv_Refactored_2M_V1\\Hummingbird_Aggressive\\Hummingbird_Aggressive-499968.onnx",
+                "reward": -0.47563353809528053,
+                "creation_time": 1751195850.442621,
+                "auxillary_file_paths": [
+                    "results\\AgrConserv_Refactored_2M_V1\\Hummingbird_Aggressive\\Hummingbird_Aggressive-499968.pt"
+                ]
+            },
+            {
+                "steps": 999960,
+                "file_path": "results\\AgrConserv_Refactored_2M_V1\\Hummingbird_Aggressive\\Hummingbird_Aggressive-999960.onnx",
+                "reward": -0.5941757213856492,
+                "creation_time": 1751197014.510535,
+                "auxillary_file_paths": [
+                    "results\\AgrConserv_Refactored_2M_V1\\Hummingbird_Aggressive\\Hummingbird_Aggressive-999960.pt"
+                ]
+            },
+            {
+                "steps": 1004608,
+                "file_path": "results\\AgrConserv_Refactored_2M_V1\\Hummingbird_Aggressive\\Hummingbird_Aggressive-1004608.onnx",
+                "reward": -0.5847366973757744,
+                "creation_time": 1751197089.280721,
+                "auxillary_file_paths": [
+                    "results\\AgrConserv_Refactored_2M_V1\\Hummingbird_Aggressive\\Hummingbird_Aggressive-1004608.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 1004608,
+            "file_path": "results\\AgrConserv_Refactored_2M_V1\\Hummingbird_Aggressive.onnx",
+            "reward": -0.5847366973757744,
+            "creation_time": 1751197089.280721,
+            "auxillary_file_paths": [
+                "results\\AgrConserv_Refactored_2M_V1\\Hummingbird_Aggressive\\Hummingbird_Aggressive-1004608.pt"
+            ]
+        }
+    },
+    "Hummingbird_Conservative": {
+        "checkpoints": [
+            {
+                "steps": 499968,
+                "file_path": "results\\AgrConserv_Refactored_2M_V1\\Hummingbird_Conservative\\Hummingbird_Conservative-499968.onnx",
+                "reward": 2.3705950155854225,
+                "creation_time": 1751195850.5225523,
+                "auxillary_file_paths": [
+                    "results\\AgrConserv_Refactored_2M_V1\\Hummingbird_Conservative\\Hummingbird_Conservative-499968.pt"
+                ]
+            },
+            {
+                "steps": 999960,
+                "file_path": "results\\AgrConserv_Refactored_2M_V1\\Hummingbird_Conservative\\Hummingbird_Conservative-999960.onnx",
+                "reward": 2.585563370159694,
+                "creation_time": 1751197014.6900833,
+                "auxillary_file_paths": [
+                    "results\\AgrConserv_Refactored_2M_V1\\Hummingbird_Conservative\\Hummingbird_Conservative-999960.pt"
+                ]
+            },
+            {
+                "steps": 1004608,
+                "file_path": "results\\AgrConserv_Refactored_2M_V1\\Hummingbird_Conservative\\Hummingbird_Conservative-1004608.onnx",
+                "reward": 2.5493133068084717,
+                "creation_time": 1751197089.3528628,
+                "auxillary_file_paths": [
+                    "results\\AgrConserv_Refactored_2M_V1\\Hummingbird_Conservative\\Hummingbird_Conservative-1004608.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 1004608,
+            "file_path": "results\\AgrConserv_Refactored_2M_V1\\Hummingbird_Conservative.onnx",
+            "reward": 2.5493133068084717,
+            "creation_time": 1751197089.3528628,
+            "auxillary_file_paths": [
+                "results\\AgrConserv_Refactored_2M_V1\\Hummingbird_Conservative\\Hummingbird_Conservative-1004608.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.7.1+cpu"
+    }
+}
