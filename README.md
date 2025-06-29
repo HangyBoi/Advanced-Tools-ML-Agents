@@ -11,4 +11,4 @@ This project explores competitive strategies in a multi-agent reinforcement lear
 
 For a detailed breakdown of the project, please visit the official project Wiki. The main page includes the abstract and a table of contents for navigation.
 
-### **[Click here to go to the Project Wiki](https://github.com/<YourUsername>/<YourRepoName>/wiki)**
+### **[Click here to go to the Project Wiki](https://github.com/HangyBoi/Advanced-Tools-ML-Agents/wiki)**
