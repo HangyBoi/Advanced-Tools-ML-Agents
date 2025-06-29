@@ -68,58 +68,68 @@ public class SimulationManager : MonoBehaviour
             activeAgents.Remove(deadAgent);
         }
 
-        // Check if the game should end AND if we aren't already ending it
-        if (!isEpisodeEnding && activeAgents.Count <= 1)
+        // Check for end condition ONLY if an episode isn't already ending.
+        if (!isEpisodeEnding)
         {
-            isEpisodeEnding = true;
-            EndEpisode();
+            if (activeAgents.Count == 1)
+            {
+                // WIN CONDITION MET!
+                isEpisodeEnding = true;
+                HummingbirdAgent winner = activeAgents[0]; // The last one remaining is the winner
+                EndEpisode(winner);
+            }
+            else if (activeAgents.Count == 0)
+            {
+                // DRAW CONDITION MET!
+                isEpisodeEnding = true;
+                EndEpisode(null); // No winner
+            }
         }
     }
 
     /// <summary>
     /// Ends the current episode, assigns rewards, and prepares for the next.
     /// </summary>
-    private void EndEpisode()
+    /// <param name="winner">The winning agent, or null for a draw.</param>
+    private void EndEpisode(HummingbirdAgent winner)
     {
-        // Start the end-of-episode sequence as a coroutine
-        StartCoroutine(EndEpisodeRoutine());
+        // Start the end-of-episode sequence, passing the winner information along.
+        StartCoroutine(EndEpisodeRoutine(winner));
     }
 
-    private IEnumerator EndEpisodeRoutine()
+    private IEnumerator EndEpisodeRoutine(HummingbirdAgent winner)
     {
-        HummingbirdAgent winner = activeAgents.FirstOrDefault();
         if (winner != null)
         {
             Debug.Log($"Winner is {winner.name}!");
-            // Give the winner a large reward for surviving. This is a very strong positive signal.
+            // This is the CRITICAL terminal reward for success.
             winner.AddReward(1.0f);
         }
         else
         {
-            // Optional: Log if there's a draw (e.g., last two agents die simultaneously)
+            // This log should now only appear when the last two agents die at the same time.
             Debug.Log("Episode ended in a draw.");
         }
 
-        // End the ML-Agents episode for every agent.
-        // This queues OnEpisodeBegin() for the next physics step.
+        // Give a penalty to all agents who died. This is their terminal reward for failure.
+        // The winner is still in the 'allAgents' list, but it did not die, so it won't have a -1 penalty.
+
+        // End the ML-Agents episode for every agent in the original list.
         foreach (var agent in allAgents)
         {
             agent.EndEpisode();
         }
 
-        // --- THE CRITICAL FIX ---
-        // Wait for the end of the frame. By this point, all physics updates (like
-        // the last agent dying) for this frame are complete.
+        // Wait for the next frame to safely reset the environment.
         yield return new WaitForEndOfFrame();
 
-        // Now that we are in the next frame, it's safe to reset the environment.
         ResetFlowersForNewEpisode();
 
         // Reset the active agent list for the new episode
         activeAgents.Clear();
         activeAgents.AddRange(allAgents);
 
-        // And finally, reset the flag.
+        // And finally, reset the flag, allowing a new episode to end.
         isEpisodeEnding = false;
     }
 

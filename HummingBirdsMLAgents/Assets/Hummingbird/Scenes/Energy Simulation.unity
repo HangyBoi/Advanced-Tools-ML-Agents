@@ -1179,6 +1179,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Hummingbird_Agressive
       objectReference: {fileID: 0}
+    - target: {fileID: 6300593070078536261, guid: fab9f74aca807d24aaa4f2a7bbfc8f19, type: 3}
+      propertyPath: MaxStep
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1394,8 +1398,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   flowerArea: {fileID: 1896657071855566745}
-  flowerCount: 8
-  agentInitialEnergy: 25
+  flowerCount: 20
+  agentInitialEnergy: 20
 --- !u!1001 &2021334603
 PrefabInstance:
   m_ObjectHideFlags: 0
