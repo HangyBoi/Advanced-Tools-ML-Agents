@@ -1,6 +1,6 @@
 # Competitive Energy Management in Multi-Agent Hummingbird Simulation
 
-![A GIF of your agents in action](URL_TO_YOUR_GIF)
+![Image](https://github.com/user-attachments/assets/76c3638e-bc0f-4d42-b85b-a933b499c868)
 *(To get the GIF URL, upload it to an issue in your repo, then copy the link address)*
 
 This project explores competitive strategies in a multi-agent reinforcement learning environment built with Unity ML-Agents. Two distinct hummingbird agent types, "Aggressive" and "Conservative," compete for limited nectar resources to out-survive their opponents.
