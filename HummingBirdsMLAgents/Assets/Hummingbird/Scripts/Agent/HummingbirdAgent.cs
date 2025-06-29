@@ -75,7 +75,7 @@ public class HummingbirdAgent : Agent
     private IRewardStrategy rewardStrategy;
 
     // Whether the agest is frozen (intentionally not flying)
-    private bool frozen = false;
+    public bool frozen = false;
 
     // A flag to ensure the death logic only runs once.
     private bool isDead = false;
@@ -107,7 +107,7 @@ public class HummingbirdAgent : Agent
         }
 
         // In a competitive setting, episodes end by condition, not steps.
-        MaxStep = 0;
+        MaxStep = 5000;
     }
 
     /// <summary>
@@ -127,8 +127,8 @@ public class HummingbirdAgent : Agent
     /// </summary>
     private void FixedUpdate()
     {
-        // If the agent is dead, do nothing.
-        if (isDead) return;
+        // If the agent is dead OR frozen, do nothing. This is a critical addition.
+        if (isDead || frozen) return;
 
         // Avoids scenario where neares flower nectar is stolen by opponent agent and not updated
         if (nearestFlower != null && !nearestFlower.HasNectar)
@@ -164,6 +164,11 @@ public class HummingbirdAgent : Agent
             // Give a large negative reward for dying.
             AddReward(-1.0f);
 
+            // --- STATS RECORDING ---
+            // Record the survival time (in steps) for this agent before it died.
+            Academy.Instance.StatsRecorder.Add("survival/time_steps", StepCount);
+            // -----------------------
+
             // Freeze the agent to stop it from moving.
             FreezeAgent();
 
@@ -181,6 +186,15 @@ public class HummingbirdAgent : Agent
     /// </summary>
     public override void OnEpisodeBegin()
     {
+        // --- NOTIFY THE MANAGER TO RESET SHARED RESOURCES ---
+        // Have the first agent in the list be the "leader" that tells the manager
+        // that a new episode has officially begun. This prevents every agent from
+        // trying to reset the flowers.
+        if (SimulationManager.Instance.IsFirstAgent(this))
+        {
+            SimulationManager.Instance.OnNewEpisodeBegan();
+        }
+
         // The agent is alive again.
         isDead = false;
 
@@ -199,8 +213,7 @@ public class HummingbirdAgent : Agent
         // Make sure the agent is active and visible
         visuals.SetActive(true);
         // Unfreeze the agent if it was frozen
-        UnfreezeAgent();
-
+        if (frozen) UnfreezeAgent();
 
         // Zero out the rigidbody velocity, so the movement stops before a new episode begins
         rigidbody.linearVelocity = Vector3.zero;
@@ -374,19 +387,23 @@ public class HummingbirdAgent : Agent
     {
         Debug.Assert(frozen == false, "Agent is already frozen");
         frozen = true;
-        // Also disable the decision requester to stop the brain from running.
-        GetComponent<DecisionRequester>().enabled = false;
+        isDead = true;
         rigidbody.Sleep();
+        var decisionRequester = GetComponent<DecisionRequester>();
+        if (decisionRequester != null) decisionRequester.enabled = false;
 
     }
 
+    /// <summary>
+    /// Unfreezes the agent, enabling decision-making and restoring physical interactions.
+    /// </summary>
     public void UnfreezeAgent()
     {
-        Debug.Assert(frozen == true, "Agent is already unfrozen");
+        // Assert should check if the agent is actually frozen before unfreezing
+        Debug.Assert(frozen == true, "Agent is not frozen, cannot unfreeze.");
         if (frozen)
         {
             frozen = false;
-            // Re-enable the decision requester.
             GetComponent<DecisionRequester>().enabled = true;
             rigidbody.WakeUp();
         }

@@ -12,6 +12,14 @@ PrefabInstance:
       propertyPath: rewardStrategyType
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2009096828608177712, guid: ee5d7605796823e44b0821e269dced5d, type: 3}
+      propertyPath: m_Model
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2009096828608177712, guid: ee5d7605796823e44b0821e269dced5d, type: 3}
+      propertyPath: m_BehaviorName
+      value: Hummingbird_Aggressive
+      objectReference: {fileID: 0}
     - target: {fileID: 6434798618752004301, guid: ee5d7605796823e44b0821e269dced5d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
