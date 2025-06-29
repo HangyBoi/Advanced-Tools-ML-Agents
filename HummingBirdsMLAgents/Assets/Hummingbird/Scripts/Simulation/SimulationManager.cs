@@ -33,11 +33,6 @@ public class SimulationManager : MonoBehaviour
     // Boolean to track if the current episode is ending.
     private bool isEpisodeEnding = false;
 
-    /// <summary>
-    /// Event fired when a new episode begins. Agents can subscribe to this.
-    /// </summary>
-    public UnityEvent OnEpisodeBegan;
-
     private void Awake()
     {
         // Singleton pattern implementation
@@ -96,8 +91,13 @@ public class SimulationManager : MonoBehaviour
         if (winner != null)
         {
             Debug.Log($"Winner is {winner.name}!");
-            // This is where we will give the winner a large reward in a future step.
-            // winner.AddReward(1.0f);
+            // Give the winner a large reward for surviving. This is a very strong positive signal.
+            winner.AddReward(1.0f);
+        }
+        else
+        {
+            // Optional: Log if there's a draw (e.g., last two agents die simultaneously)
+            Debug.Log("Episode ended in a draw.");
         }
 
         // End the ML-Agents episode for every agent.

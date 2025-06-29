@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
@@ -76,6 +77,9 @@ public class HummingbirdAgent : Agent
     // Whether the agest is frozen (intentionally not flying)
     private bool frozen = false;
 
+    // A flag to ensure the death logic only runs once.
+    private bool isDead = false;
+
     /// <summary>
     /// The amount of ntar the agent has obtained from the flowers this episode.
     /// </summary>
@@ -91,13 +95,6 @@ public class HummingbirdAgent : Agent
     public override void Initialize()
     {
         rigidbody = GetComponent<Rigidbody>();
-
-        // The agent finds the SimulationManager and subscribes its reset logic to the manager's event.
-        // This is more robust than the manager knowing about every agent's methods.
-        if (SimulationManager.Instance != null)
-        {
-            SimulationManager.Instance.OnEpisodeBegan.AddListener(OnEpisodeBegin);
-        }
 
         // Instantiate the correct strategy based on the Inspector setting
         if (rewardStrategyType == RewardStrategyType.Conservative)
@@ -130,6 +127,9 @@ public class HummingbirdAgent : Agent
     /// </summary>
     private void FixedUpdate()
     {
+        // If the agent is dead, do nothing.
+        if (isDead) return;
+
         // Avoids scenario where neares flower nectar is stolen by opponent agent and not updated
         if (nearestFlower != null && !nearestFlower.HasNectar)
         {
@@ -153,10 +153,13 @@ public class HummingbirdAgent : Agent
         currentEnergy -= energyToDrain;
 
         // --- DEATH CHECK ---
-        // If energy has run out, the agent dies.
-        if (currentEnergy <= 0f)
+        // If energy has run out AND the agent isn't already dead...
+        if (currentEnergy <= 0f && !isDead)
         {
             currentEnergy = 0f;
+
+            // Set the flag immediately to prevent this from running again.
+            isDead = true;
 
             // Give a large negative reward for dying.
             AddReward(-1.0f);
@@ -177,6 +180,12 @@ public class HummingbirdAgent : Agent
     /// </summary>
     public override void OnEpisodeBegin()
     {
+        // The agent is alive again.
+        isDead = false;
+
+        // Clear the previous target to force a fresh search.
+        nearestFlower = null;
+
         //Reset nectar obtained
         NectarObtained = 0f;
 
@@ -268,7 +277,7 @@ public class HummingbirdAgent : Agent
         // If nearest flower is null, observer an empty array and return early
         if (nearestFlower == null)
         {
-            sensor.AddObservation(new float[10]);
+            sensor.AddObservation(new float[11]);
             return;
         }
 
@@ -362,15 +371,20 @@ public class HummingbirdAgent : Agent
     /// </summary>
     public void FreezeAgent()
     {
-
+        Debug.Assert(frozen == false, "Agent is already frozen");
         frozen = true;
         rigidbody.Sleep();
+        // Also disable the decision requester to stop the brain from running.
+        GetComponent<DecisionRequester>().enabled = false;
     }
 
     public void UnfreezeAgent()
     {
+        Debug.Assert(frozen == true, "Agent is already unfrozen");
         frozen = false;
         rigidbody.WakeUp();
+        // Re-enable the decision requester.
+        GetComponent<DecisionRequester>().enabled = true;
     }
 
     /// <summary>
@@ -385,14 +399,17 @@ public class HummingbirdAgent : Agent
         Vector3 potentialPosition = Vector3.zero;
         Quaternion potentialRotation = new Quaternion();
 
+        // Get a reference to the flower list from the simulation manager
+        List<Flower> flowerList = SimulationManager.Instance.flowerArea.Flowers;
+
         // Loop until a safe position is found or attempts run out
         while (!safePositionFound && attemptsRemaining > 0)
         {
             attemptsRemaining--;
-            if (inFrontOfFlower)
+            if (inFrontOfFlower && flowerList.Count > 0)
             {
                 // Pick a random flower from the flower area
-                Flower randomFlower = SimulationManager.Instance.flowerArea.Flowers[UnityEngine.Random.Range(0, SimulationManager.Instance.flowerArea.Flowers.Count)];
+                Flower randomFlower = flowerList[UnityEngine.Random.Range(0, flowerList.Count)];
 
                 // Position 10 to 20 cm in front of the flower
                 float distanceFromFlower = UnityEngine.Random.Range(0.1f, 0.2f);
@@ -436,7 +453,7 @@ public class HummingbirdAgent : Agent
     }
 
     /// <summary>
-    /// Updatw the nearest flower to the agent
+    /// Update the nearest flower to the agent
     /// </summary>
     public void UpdateNearestFlower()
     {

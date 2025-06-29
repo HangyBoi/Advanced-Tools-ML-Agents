@@ -33,12 +33,22 @@ public class FlowerArea : MonoBehaviour
         flowerPlants = new List<GameObject>();
         nectarColliderToFlowerDictionary = new Dictionary<Collider, Flower>();
         Flowers = new List<Flower>();
+
+        // Find all flowers as soon as this object wakes up.
+        // This ensures the list is populated before any other script's Start() method can ask for it.
+        FindChildFlowers(transform);
     }
 
     private void Start()
     {
-        // Find all flowers that are children of this GameObject/Transform
-        FindChildFlowers(transform);
+        foreach (Flower flower in Flowers)
+        {
+            // Check to prevent errors if a flower is misconfigured
+            if (flower.nectarCollider != null)
+            {
+                nectarColliderToFlowerDictionary.Add(flower.nectarCollider, flower);
+            }
+        }
     }
 
     /// <summary>
@@ -129,7 +139,7 @@ public class FlowerArea : MonoBehaviour
                     Flowers.Add(flower);
 
                     // Add the nectar collider to the dictionary for quick lookup
-                    nectarColliderToFlowerDictionary.Add(flower.nectarCollider, flower);
+                    //nectarColliderToFlowerDictionary.Add(flower.nectarCollider, flower);
 
                     // Note: there are no flowers that are childer of other flowers
                 }

@@ -117,7 +117,7 @@ public class Flower : MonoBehaviour
     /// <summary>
     /// Called when the flower wakes up.
     /// </summary>
-    private void Awake()
+    private void Start()
     {
         // Find the flower's mesh renderer and get its material
         MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
