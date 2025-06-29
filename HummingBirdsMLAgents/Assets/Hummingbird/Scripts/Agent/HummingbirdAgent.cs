@@ -173,7 +173,14 @@ public class HummingbirdAgent : Agent
             // --- STATS RECORDING ---
             // Record the survival time (in steps) for this agent before it died.
             Academy.Instance.StatsRecorder.Add("survival/time_steps", StepCount);
-            // -----------------------
+
+            // Record the nectar obtained by this agent.
+            Academy.Instance.StatsRecorder.Add("stats/NectarObtained", NectarObtained);
+            if (StepCount > 0)
+            {
+                Academy.Instance.StatsRecorder.Add("stats/EnergyEfficiency", NectarObtained / StepCount);
+            }
+            // ------------------------------------
 
             // Freeze the agent to stop it from moving.
             FreezeAgent();

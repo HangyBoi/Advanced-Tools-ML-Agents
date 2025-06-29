@@ -147,6 +147,14 @@ public class SimulationManager : MonoBehaviour
             // --- STATS RECORDING ---
             // Record the survival time for the WINNER.
             Academy.Instance.StatsRecorder.Add("survival/time_steps", winner.StepCount);
+
+            // Record the nectar obtained by the WINNER.
+            Academy.Instance.StatsRecorder.Add("stats/NectarObtained", winner.NectarObtained);
+            if (winner.StepCount > 0)
+            {
+                Academy.Instance.StatsRecorder.Add("stats/EnergyEfficiency", winner.NectarObtained / winner.StepCount);
+            }
+            // ----------------
         }
         else 
         {
