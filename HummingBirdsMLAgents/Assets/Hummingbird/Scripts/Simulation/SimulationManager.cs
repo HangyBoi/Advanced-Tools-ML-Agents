@@ -48,25 +48,36 @@ public class SimulationManager : MonoBehaviour
         // Get the current lesson number from the Academy
         float lesson = Academy.Instance.EnvironmentParameters.GetWithDefault("lesson", 0f);
 
-        // This is where you set your parameters based on the lesson number
-        // Example: As the lesson number increases, we DECREASE the number of flowers.
+        // Announce the new lesson in the console for easy debugging
+        Debug.Log($"<color=cyan>--- Applying Lesson: {lesson} ---</color>");
+
+        // Let's assume ~180 total flowers per island.
         if (lesson < 0.33f)
         {
-            // Lesson 1: Easy Mode
-            flowerCount = 24; // Abundant flowers
-            agentInitialEnergy = 40; // More starting energy
+            // === LESSON 1: "Abundant Paradise" ===
+            // Goal: Teach the absolute basic link: FLOWER -> ENERGY -> SURVIVAL
+            // Over half the flowers are active. The world is saturated with resources.
+            flowerCount = 100; // Approx. 55% of flowers are active. Very high chance of success.
+            agentInitialEnergy = 50; // Very generous energy. Agents can make many mistakes.
+            Debug.Log("<color=green>Difficulty set to EASY: 100 Flowers, 50 Energy</color>");
         }
         else if (lesson < 0.66f)
         {
-            // Lesson 2: Medium Mode
-            flowerCount = 16;
-            agentInitialEnergy = 30;
+            // === LESSON 2: "The Search Begins" ===
+            // Goal: Teach agents to actively SEARCH for flowers, not just wander.
+            // The density is lowered significantly, requiring purposeful flight.
+            flowerCount = 45; // Approx. 25% of flowers active. Searching is now a required skill.
+            agentInitialEnergy = 35; // Less energy, mistakes are more costly.
+            Debug.Log("<color=orange>Difficulty set to MEDIUM: 45 Flowers, 35 Energy</color>");
         }
         else
         {
-            // Lesson 3: Hard Mode (your target difficulty)
-            flowerCount = 12;
-            agentInitialEnergy = 25;
+            // === LESSON 3: "Competitive Scarcity" ===
+            // Goal: Teach agents to compete and manage energy efficiently.
+            // This is our target difficulty for the final evaluation. Flowers are a contested resource.
+            flowerCount = 20; // Approx. 11% active. This is now a truly competitive environment.
+            agentInitialEnergy = 25; // Low starting energy. Every action matters.
+            Debug.Log("<color=red>Difficulty set to HARD: 20 Flowers, 25 Energy</color>");
         }
     }
 
