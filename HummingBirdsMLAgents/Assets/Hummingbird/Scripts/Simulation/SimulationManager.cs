@@ -144,14 +144,19 @@ public class SimulationManager : MonoBehaviour
             winner.FreezeAgent();
 
             // --- STATS RECORDING ---
+            // Get the winner's strategy name to create unique stat keys.
+            string strategyName = winner.rewardStrategyType.ToString();
+
             // Record the survival time for the WINNER.
-            Academy.Instance.StatsRecorder.Add("survival/time_steps", winner.StepCount);
+            Academy.Instance.StatsRecorder.Add($"survival/{strategyName}/time_steps", winner.StepCount);
 
             // Record the nectar obtained by the WINNER.
-            Academy.Instance.StatsRecorder.Add("stats/NectarObtained", winner.NectarObtained);
+            Academy.Instance.StatsRecorder.Add($"stats/{strategyName}/NectarObtained", winner.NectarObtained);
+
+            // Record the energy efficiency for the WINNER.
             if (winner.StepCount > 0)
             {
-                Academy.Instance.StatsRecorder.Add("stats/EnergyEfficiency", winner.NectarObtained / winner.StepCount);
+                Academy.Instance.StatsRecorder.Add($"stats/{strategyName}/EnergyEfficiency", winner.NectarObtained / winner.StepCount);
             }
             // ----------------
         }

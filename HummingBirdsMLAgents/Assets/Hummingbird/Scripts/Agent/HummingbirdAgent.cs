@@ -171,14 +171,19 @@ public class HummingbirdAgent : Agent
             AddReward(-1.0f);
 
             // --- STATS RECORDING ---
+            // Get the strategy name to create unique stat keys.
+            string strategyName = rewardStrategyType.ToString();
+
             // Record the survival time (in steps) for this agent before it died.
-            Academy.Instance.StatsRecorder.Add("survival/time_steps", StepCount);
+            Academy.Instance.StatsRecorder.Add($"survival/{strategyName}/time_steps", StepCount);
 
             // Record the nectar obtained by this agent.
-            Academy.Instance.StatsRecorder.Add("stats/NectarObtained", NectarObtained);
+            Academy.Instance.StatsRecorder.Add($"stats/{strategyName}/NectarObtained", NectarObtained);
+
+            // Record the energy efficiency for this agent.
             if (StepCount > 0)
             {
-                Academy.Instance.StatsRecorder.Add("stats/EnergyEfficiency", NectarObtained / StepCount);
+                Academy.Instance.StatsRecorder.Add($"stats/{strategyName}/EnergyEfficiency", NectarObtained / StepCount);
             }
             // ------------------------------------
 
@@ -536,7 +541,7 @@ public class HummingbirdAgent : Agent
 
         foreach (Flower flower in flowerArea.Flowers)
         {
-            // --- THIS IS THE FIX ---
+
             // If the flower's GameObject is not active in the scene, skip it.
             if (!flower.gameObject.activeInHierarchy)
             {
@@ -681,4 +686,3 @@ public class HummingbirdAgent : Agent
         }
     }
 }
-

@@ -139,10 +139,7 @@ public class FlowerArea : MonoBehaviour
                     // Found a flower, add it to the list
                     Flowers.Add(flower);
 
-                    // Add the nectar collider to the dictionary for quick lookup
-                    //nectarColliderToFlowerDictionary.Add(flower.nectarCollider, flower);
-
-                    // Note: there are no flowers that are childer of other flowers
+                    // Note: there are no flowers that are children of other flowers
                 }
                 else
                 {
