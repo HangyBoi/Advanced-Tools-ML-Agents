@@ -485,8 +485,19 @@ public class HummingbirdAgent : Agent
     /// </summary>
     public void UpdateNearestFlower()
     {
+        // Set nearest flower to null to ensure a fresh search
+        nearestFlower = null;
+
         foreach (Flower flower in flowerArea.Flowers)
         {
+            // --- THIS IS THE FIX ---
+            // If the flower's GameObject is not active in the scene, skip it.
+            if (!flower.gameObject.activeInHierarchy)
+            {
+                continue;
+            }
+            // ---------------------
+
             // If this is the first flower or the current flower is closer than the previous nearest
             if (nearestFlower == null && flower.HasNectar)
             {
