@@ -99,16 +99,15 @@ public class SimulationManager : MonoBehaviour
         if (winner != null)
         {
             Debug.Log($"<color=green>Winner is {winner.name}! Assigning +1.0 reward.</color>");
+            winner.AddReward(1.0f);
 
             winner.FreezeAgent();
-            winner.AddReward(1.0f);
 
             // --- STATS RECORDING ---
             // Record the survival time for the WINNER.
             Academy.Instance.StatsRecorder.Add("survival/time_steps", winner.StepCount);
-            // -----------------------
         }
-        else
+        else 
         {
             Debug.Log("<color=orange>Episode ended in a draw or with no survivors.</color>");
         }
@@ -126,14 +125,11 @@ public class SimulationManager : MonoBehaviour
         }
         else if (allAgents.Count > 0)
         {
-            // Pick any agent to end the episode if there's a draw.
-            // We need to unfreeze it temporarily just to call EndEpisode, as a frozen agent might not respond.
-            // This is an edge case, but good to handle.
-            HummingbirdAgent agentToReset = allAgents.First(a => a.gameObject.activeInHierarchy);
-            if (agentToReset.frozen) agentToReset.UnfreezeAgent(); // Temporary unfreeze
-            agentToReset.EndEpisode();
+            // If there's a draw (0 agents left), we still need to trigger the reset.
+            // Pick the first agent from the master list to do it.
+            allAgents[0].EndEpisode();
         }
-
+        
         Debug.Log($"<color=magenta>EndEpisodeRoutine has finished. Called EndEpisode() to trigger the next round.</color>");
     }
 }
