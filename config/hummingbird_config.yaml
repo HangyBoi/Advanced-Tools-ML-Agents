@@ -17,6 +17,9 @@ behaviors:
       extrinsic:
         gamma: 0.99
         strength: 1.0
+    max_steps: 2000000
+    time_horizon: 64
+    summary_freq: 10000
 
   Hummingbird_Aggressive:
     trainer_type: ppo
@@ -36,3 +39,6 @@ behaviors:
       extrinsic:
         gamma: 0.99
         strength: 1.0
+    max_steps: 2000000
+    time_horizon: 64
+    summary_freq: 10000

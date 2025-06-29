@@ -50,6 +50,9 @@ public class HummingbirdAgent : Agent
     // The rigidbody component of the agent
     new private Rigidbody rigidbody;
 
+    // Reference to the FlowerArea this agent belongs to
+    private FlowerArea flowerArea;
+
     // The nearest flower to the agent
     private Flower nearestFlower;
 
@@ -95,6 +98,9 @@ public class HummingbirdAgent : Agent
     public override void Initialize()
     {
         rigidbody = GetComponent<Rigidbody>();
+
+        // Find the FlowerArea that this agent is a child of
+        flowerArea = GetComponentInParent<FlowerArea>();
 
         // Instantiate the correct strategy based on the Inspector setting
         if (rewardStrategyType == RewardStrategyType.Conservative)
@@ -422,7 +428,7 @@ public class HummingbirdAgent : Agent
         Quaternion potentialRotation = new Quaternion();
 
         // Get a reference to the flower list from the simulation manager
-        List<Flower> flowerList = SimulationManager.Instance.flowerArea.Flowers;
+        List<Flower> flowerList = flowerArea.Flowers;
 
         // Loop until a safe position is found or attempts run out
         while (!safePositionFound && attemptsRemaining > 0)
@@ -453,7 +459,7 @@ public class HummingbirdAgent : Agent
                 Quaternion direction = Quaternion.Euler(0f, UnityEngine.Random.Range(-180f, 180f), 0f);
 
                 // Combine the height, radius and direction to pick a potential position
-                potentialPosition = SimulationManager.Instance.flowerArea.transform.position + Vector3.up * height + direction * Vector3.forward * radius;
+                potentialPosition = flowerArea.transform.position + Vector3.up * height + direction * Vector3.forward * radius;
 
                 // Choose and set random starting pitch and yaw
                 float pitch = UnityEngine.Random.Range(-60f, 60f);
@@ -479,7 +485,7 @@ public class HummingbirdAgent : Agent
     /// </summary>
     public void UpdateNearestFlower()
     {
-        foreach (Flower flower in SimulationManager.Instance.flowerArea.Flowers)
+        foreach (Flower flower in flowerArea.Flowers)
         {
             // If this is the first flower or the current flower is closer than the previous nearest
             if (nearestFlower == null && flower.HasNectar)
@@ -536,7 +542,7 @@ public class HummingbirdAgent : Agent
             if (Vector3.Distance(beakTip.position, closestPointToBeakTip) < BeakTipRadius)
             {
                 // Look up the flower for this nectar collider
-                Flower flower = SimulationManager.Instance.flowerArea.GetFlowerFromNectar(collider);
+                Flower flower = flowerArea.GetFlowerFromNectar(collider);
 
                 // Attempt to take nectar from the flower. The amount is based on the drain rate
                 // to create a balanced system where drinking replenishes energy at a good pace.

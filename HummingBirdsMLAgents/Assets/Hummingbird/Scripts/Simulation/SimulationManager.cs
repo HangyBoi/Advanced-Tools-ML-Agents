@@ -8,7 +8,7 @@ public class SimulationManager : MonoBehaviour
 {
     public static SimulationManager Instance { get; private set; }
 
-    public FlowerArea flowerArea;
+    public List<FlowerArea> flowerAreas;
     public int flowerCount = 8;
     public float agentInitialEnergy = 25f;
 
@@ -52,9 +52,12 @@ public class SimulationManager : MonoBehaviour
         Debug.Log($"<color=lime>--- OnNewEpisodeBegan CALLED on Manager. Resetting environment. ---</color>");
         isEpisodeEnding = false;
 
-        // Reset and spawn flowers
-        if (flowerCount > 0) { flowerArea.ResetAndEnableRandomFlowers(flowerCount); }
-        else { flowerArea.ResetFlowers(); }
+        // Loop through every FlowerArea and reset it
+        foreach (var area in flowerAreas)
+        {
+            if (flowerCount > 0) { area.ResetAndEnableRandomFlowers(flowerCount); }
+            else { area.ResetFlowers(); }
+        }
 
         // Refill the list of active agents for the new round
         activeAgents = new List<HummingbirdAgent>(allAgents);

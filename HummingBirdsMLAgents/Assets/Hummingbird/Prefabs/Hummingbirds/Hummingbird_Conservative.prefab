@@ -11,7 +11,7 @@ PrefabInstance:
     - target: {fileID: 2009096828608177712, guid: ee5d7605796823e44b0821e269dced5d, type: 3}
       propertyPath: m_Model
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 5022602860645237092, guid: 19730245c745d5c4b87b1515130f2697, type: 3}
     - target: {fileID: 2009096828608177712, guid: ee5d7605796823e44b0821e269dced5d, type: 3}
       propertyPath: m_BehaviorName
       value: Hummingbird_Conservative

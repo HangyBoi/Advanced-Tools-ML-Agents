@@ -24,9 +24,6 @@ public class FlowerArea : MonoBehaviour
     public List<Flower> Flowers { get; private set; }
 
 
-    /// <summary>
-    /// Called when the area wakes up.
-    /// </summary>
     private void Awake()
     {
         // Initialize variables
@@ -35,18 +32,22 @@ public class FlowerArea : MonoBehaviour
         Flowers = new List<Flower>();
 
         // Find all flowers as soon as this object wakes up.
-        // This ensures the list is populated before any other script's Start() method can ask for it.
         FindChildFlowers(transform);
-    }
 
-    private void Start()
-    {
+        // --- NEW LOGIC: Populate the dictionary right here ---
+        // By doing this in Awake(), we guarantee it runs before any agent can interact.
         foreach (Flower flower in Flowers)
         {
             // Check to prevent errors if a flower is misconfigured
             if (flower.nectarCollider != null)
             {
+                // Add the collider and its parent flower to the dictionary
                 nectarColliderToFlowerDictionary.Add(flower.nectarCollider, flower);
+            }
+            else
+            {
+                // This debug message is a lifesaver for finding broken prefabs.
+                Debug.LogError($"Flower '{flower.gameObject.name}' under '{this.gameObject.name}' is missing its nectarCollider reference!", flower.gameObject);
             }
         }
     }

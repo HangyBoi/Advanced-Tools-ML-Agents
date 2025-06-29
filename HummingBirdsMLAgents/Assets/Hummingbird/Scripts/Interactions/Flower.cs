@@ -11,10 +11,7 @@ public class Flower : MonoBehaviour
     [Tooltip("The color when the flowes is empty")]
     public Color emptyFlowerColor = new(.5f, 0f, 1f);
 
-    /// <summary>
-    /// The trigger collider for the nectar.
-    /// </summary>
-    [HideInInspector]
+    [Tooltip("The trigger collider for the nectar. Should be a child of this GameObject.")]
     public Collider nectarCollider;
 
     // The solid collider representing the flower petals
@@ -125,6 +122,5 @@ public class Flower : MonoBehaviour
 
         // Find the nectar collider (trigger) and the flower collider (solid)
         flowerCollider = transform.Find("FlowerCollider").GetComponent<Collider>();
-        nectarCollider = transform.Find("FlowerNectarCollider").GetComponent<Collider>();
     }
 }

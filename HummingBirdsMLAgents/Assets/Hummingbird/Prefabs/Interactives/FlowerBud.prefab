@@ -689,4 +689,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fullFlowerColor: {r: 1, g: 0, b: 0.3, a: 1}
   emptyFlowerColor: {r: 0.5, g: 0, b: 1, a: 1}
-  nectarCollider: {fileID: 0}
+  nectarCollider: {fileID: 2643483231814198236}
