@@ -39,8 +39,6 @@ public class SimulationManager : MonoBehaviour
 
     private void Start()
     {
-        // Subscribe to lesson changes
-        Academy.Instance.OnEnvironmentReset += ApplyCurriculum;
     }
 
     private void ApplyCurriculum()
@@ -87,6 +85,8 @@ public class SimulationManager : MonoBehaviour
     /// </summary>
     public void OnNewEpisodeBegan()
     {
+        ApplyCurriculum();
+
         Debug.Log($"<color=lime>--- OnNewEpisodeBegan CALLED on Manager. Resetting environment. ---</color>");
         isEpisodeEnding = false;
 

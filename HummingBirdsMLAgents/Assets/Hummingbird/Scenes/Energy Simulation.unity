@@ -12313,6 +12313,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5046960424489881262, guid: 681ae66681fb7c0409764abd33c9d383, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5972443953496082224, guid: 681ae66681fb7c0409764abd33c9d383, type: 3}
       propertyPath: m_Name
       value: FlowerPlant (2)

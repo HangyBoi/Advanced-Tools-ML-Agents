@@ -1,0 +1,108 @@
+{
+    "lesson": {
+        "lesson_num": 2
+    },
+    "Hummingbird_Aggressive": {
+        "checkpoints": [
+            {
+                "steps": 499968,
+                "file_path": "results\\AgrConserv_Refactored_2M_Almost-Final_v4\\Hummingbird_Aggressive\\Hummingbird_Aggressive-499968.onnx",
+                "reward": 7.78277625888586,
+                "creation_time": 1751206568.407111,
+                "auxillary_file_paths": [
+                    "results\\AgrConserv_Refactored_2M_Almost-Final_v4\\Hummingbird_Aggressive\\Hummingbird_Aggressive-499968.pt"
+                ]
+            },
+            {
+                "steps": 999960,
+                "file_path": "results\\AgrConserv_Refactored_2M_Almost-Final_v4\\Hummingbird_Aggressive\\Hummingbird_Aggressive-999960.onnx",
+                "reward": 52.67870174135481,
+                "creation_time": 1751207817.2198312,
+                "auxillary_file_paths": [
+                    "results\\AgrConserv_Refactored_2M_Almost-Final_v4\\Hummingbird_Aggressive\\Hummingbird_Aggressive-999960.pt"
+                ]
+            },
+            {
+                "steps": 1499968,
+                "file_path": "results\\AgrConserv_Refactored_2M_Almost-Final_v4\\Hummingbird_Aggressive\\Hummingbird_Aggressive-1499968.onnx",
+                "reward": 103.61920155584812,
+                "creation_time": 1751209126.7730465,
+                "auxillary_file_paths": [
+                    "results\\AgrConserv_Refactored_2M_Almost-Final_v4\\Hummingbird_Aggressive\\Hummingbird_Aggressive-1499968.pt"
+                ]
+            },
+            {
+                "steps": 1743168,
+                "file_path": "results\\AgrConserv_Refactored_2M_Almost-Final_v4\\Hummingbird_Aggressive\\Hummingbird_Aggressive-1743168.onnx",
+                "reward": null,
+                "creation_time": 1751209867.7845106,
+                "auxillary_file_paths": [
+                    "results\\AgrConserv_Refactored_2M_Almost-Final_v4\\Hummingbird_Aggressive\\Hummingbird_Aggressive-1743168.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 1743168,
+            "file_path": "results\\AgrConserv_Refactored_2M_Almost-Final_v4\\Hummingbird_Aggressive.onnx",
+            "reward": null,
+            "creation_time": 1751209867.7845106,
+            "auxillary_file_paths": [
+                "results\\AgrConserv_Refactored_2M_Almost-Final_v4\\Hummingbird_Aggressive\\Hummingbird_Aggressive-1743168.pt"
+            ]
+        }
+    },
+    "Hummingbird_Conservative": {
+        "checkpoints": [
+            {
+                "steps": 499968,
+                "file_path": "results\\AgrConserv_Refactored_2M_Almost-Final_v4\\Hummingbird_Conservative\\Hummingbird_Conservative-499968.onnx",
+                "reward": 1.7095308806747198,
+                "creation_time": 1751206568.5041504,
+                "auxillary_file_paths": [
+                    "results\\AgrConserv_Refactored_2M_Almost-Final_v4\\Hummingbird_Conservative\\Hummingbird_Conservative-499968.pt"
+                ]
+            },
+            {
+                "steps": 999960,
+                "file_path": "results\\AgrConserv_Refactored_2M_Almost-Final_v4\\Hummingbird_Conservative\\Hummingbird_Conservative-999960.onnx",
+                "reward": 1.81323361822537,
+                "creation_time": 1751207817.2922235,
+                "auxillary_file_paths": [
+                    "results\\AgrConserv_Refactored_2M_Almost-Final_v4\\Hummingbird_Conservative\\Hummingbird_Conservative-999960.pt"
+                ]
+            },
+            {
+                "steps": 1499968,
+                "file_path": "results\\AgrConserv_Refactored_2M_Almost-Final_v4\\Hummingbird_Conservative\\Hummingbird_Conservative-1499968.onnx",
+                "reward": 1.6169393993914127,
+                "creation_time": 1751209126.8681161,
+                "auxillary_file_paths": [
+                    "results\\AgrConserv_Refactored_2M_Almost-Final_v4\\Hummingbird_Conservative\\Hummingbird_Conservative-1499968.pt"
+                ]
+            },
+            {
+                "steps": 1743168,
+                "file_path": "results\\AgrConserv_Refactored_2M_Almost-Final_v4\\Hummingbird_Conservative\\Hummingbird_Conservative-1743168.onnx",
+                "reward": null,
+                "creation_time": 1751209867.85779,
+                "auxillary_file_paths": [
+                    "results\\AgrConserv_Refactored_2M_Almost-Final_v4\\Hummingbird_Conservative\\Hummingbird_Conservative-1743168.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 1743168,
+            "file_path": "results\\AgrConserv_Refactored_2M_Almost-Final_v4\\Hummingbird_Conservative.onnx",
+            "reward": null,
+            "creation_time": 1751209867.85779,
+            "auxillary_file_paths": [
+                "results\\AgrConserv_Refactored_2M_Almost-Final_v4\\Hummingbird_Conservative\\Hummingbird_Conservative-1743168.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.7.1+cpu"
+    }
+}
